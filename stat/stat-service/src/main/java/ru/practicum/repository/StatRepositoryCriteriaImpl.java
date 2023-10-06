@@ -27,7 +27,7 @@ public class StatRepositoryCriteriaImpl implements StatRepositoryCriteria {
         CriteriaQuery<Hit> criteriaQuery = criteriaBuilder.createQuery(Hit.class);
         Root<Hit> root = criteriaQuery.from(Hit.class);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         Predicate predicateTime = criteriaBuilder.between(root.get("timestamp"),
                 LocalDateTime.parse(start, formatter),
                 LocalDateTime.parse(end, formatter));

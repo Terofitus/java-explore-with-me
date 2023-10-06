@@ -27,6 +27,6 @@ public class StatController {
                                     @RequestParam(required = false) Boolean unique,
                                     @RequestParam(required = false) List<String> uris) {
 
-        return StatMapper.toListViewNotUnique(statService.getStats(start, end, unique, uris), unique);
+        return StatMapper.toListViewNotUnique(statService.getStats(start, end, uris), unique);
     }
 }
