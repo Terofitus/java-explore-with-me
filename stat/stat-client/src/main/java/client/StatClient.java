@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,8 +19,8 @@ public class StatClient {
 
     public List<ViewStats> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         HashMap<String, String> params = new HashMap<>();
-        params.put("start", start.toString());
-        params.put("end", end.toString());
+        params.put("start", URLEncoder.encode(start.toString(), StandardCharsets.UTF_8));
+        params.put("end", URLEncoder.encode(end.toString(), StandardCharsets.UTF_8));
         params.put("unique", unique.toString());
         String uri = "/stats?start={start}&end={end}&unique={unique}";
         if (!uris.isEmpty()) {

@@ -5,9 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.model.Hit;
 import ru.practicum.repository.StatRepository;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,13 +24,14 @@ public class StatServiceImpl implements StatService {
     @Override
     public List<Hit> getStats(String start, String end, List<String> uris) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        start = URLDecoder.decode(start, StandardCharsets.UTF_8);
+        end = URLDecoder.decode(end, StandardCharsets.UTF_8);
         if (start == null || end == null) {
             throw new IllegalArgumentException("Запрос должен содержать \"start\" и \"end\" параметры");
         } else if (LocalDateTime.parse(start, formatter)
                 .isAfter(LocalDateTime.parse(end, formatter))) {
             throw new IllegalArgumentException("\"Start\" не может быть позже \"end\"");
         }
-        if (uris.isEmpty()) return Collections.emptyList();
         return statRepository.getStats(start, end, uris);
     }
 }
