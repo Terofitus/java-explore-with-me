@@ -20,6 +20,6 @@ public class EndpointHit {
     String uri;
     @NotNull
     String ip;
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     LocalDateTime timestamp;
 }
