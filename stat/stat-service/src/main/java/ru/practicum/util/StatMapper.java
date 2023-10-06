@@ -5,6 +5,8 @@ import dto.ViewStats;
 import lombok.experimental.UtilityClass;
 import ru.practicum.model.Hit;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @UtilityClass
@@ -30,6 +32,7 @@ public class StatMapper {
     }
 
     public Hit toHit(EndpointHit hit) {
-        return new Hit(null, hit.getApp(), hit.getUri(), hit.getIp(), hit.getTimestamp());
+        return new Hit(null, hit.getApp(), hit.getUri(), hit.getIp(), LocalDateTime.parse(hit.getTimestamp(),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
     }
 }
