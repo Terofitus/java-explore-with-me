@@ -28,7 +28,7 @@ public class StatMapper {
         }
         for (String key: uris) {
             viewList.add(new ViewStats("ewm-main-service", key,
-                    unique != null && unique?count:urisStat.get(key)));
+                    unique != null && unique ? count : urisStat.get(key)));
         }
         return viewList.stream().sorted((o1, o2) -> o2.getHits() - o1.getHits()).collect(Collectors.toList());
     }
