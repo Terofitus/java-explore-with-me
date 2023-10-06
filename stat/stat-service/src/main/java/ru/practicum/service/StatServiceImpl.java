@@ -7,7 +7,6 @@ import ru.practicum.repository.StatRepository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -29,7 +28,6 @@ public class StatServiceImpl implements StatService {
                 .isAfter(LocalDateTime.parse(end, formatter))) {
             throw new IllegalArgumentException("\"Start\" не может быть позже \"end\"");
         }
-        if (uris.isEmpty()) return Collections.emptyList();
         return statRepository.getStats(start, end, uris);
     }
 }
