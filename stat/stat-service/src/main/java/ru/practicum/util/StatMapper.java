@@ -8,6 +8,7 @@ import ru.practicum.model.Hit;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class StatMapper {
@@ -29,7 +30,7 @@ public class StatMapper {
             viewList.add(new ViewStats("ewm-main-service", key,
                     unique != null && unique?count:urisStat.get(key)));
         }
-        return viewList;
+        return viewList.stream().sorted((o1, o2) -> o2.getHits() - o1.getHits()).collect(Collectors.toList());
     }
 
     public Hit toHit(EndpointHit hit) {
