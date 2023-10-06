@@ -25,9 +25,9 @@ public class StatMapper {
             }
             count = ipStat.size();
         }
-        for (String key : uris) {
+        for (String key: uris) {
             viewList.add(new ViewStats("ewm-main-service", key,
-                    unique != null && unique ? count: urisStat.get(key)));
+                    unique != null && unique?count:urisStat.get(key)));
         }
         return viewList;
     }
