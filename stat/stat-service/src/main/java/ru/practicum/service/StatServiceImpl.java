@@ -21,7 +21,7 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<Hit> getStats(String start, String end, Boolean unique, List<String> uris) {
+    public List<Hit> getStats(String start, String end, List<String> uris) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (start == null || end == null) {
             throw new IllegalArgumentException("Запрос должен содержать \"start\" и \"end\" параметры");
