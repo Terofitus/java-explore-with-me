@@ -7,23 +7,23 @@ import java.time.LocalDateTime;
 
 @Data
 public class EventFullDto {
-    String annotation;
-    CategoryDto category;
-    Integer confirmedRequests;
+    private String annotation;
+    private CategoryDto category;
+    private Integer confirmedRequests;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime createdOn = LocalDateTime.now();
-    String description;
+    private LocalDateTime createdOn = LocalDateTime.now();
+    private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
-    Integer id;
-    UserShortDto initiator;
-    Location location;
-    Boolean paid;
-    Integer participantLimit;
+    private LocalDateTime eventDate;
+    private Integer id;
+    private UserShortDto initiator;
+    private Location location;
+    private Boolean paid;
+    private Integer participantLimit;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime publishedOn;
-    Boolean requestModeration;
-    EventState state;
-    String title;
-    Integer views;
+    private LocalDateTime publishedOn;
+    private Boolean requestModeration;
+    private EventState state;
+    private String title;
+    private Integer views;
 }

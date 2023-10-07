@@ -12,10 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 public class NewCompilationDto {
     @NotNull
-    List<Integer> events;
-    Boolean pinned;
+    private List<Integer> events;
+    private Boolean pinned;
     @NotNull
     @NotBlank
     @Size(min = 1, max = 50)
-    String title;
+    private String title;
 }

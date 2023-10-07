@@ -9,14 +9,14 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class EventShortDto {
-    String annotation;
-    CategoryDto category;
-    Integer confirmedRequests;
+    private String annotation;
+    private CategoryDto category;
+    private Integer confirmedRequests;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
-    Integer id;
-    UserShortDto initiator;
-    Boolean paid;
-    String title;
-    Integer views;
+    private LocalDateTime eventDate;
+    private Integer id;
+    private UserShortDto initiator;
+    private Boolean paid;
+    private String title;
+    private Integer views;
 }

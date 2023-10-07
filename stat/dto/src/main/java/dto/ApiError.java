@@ -10,10 +10,10 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class ApiError {
-    List<String> errors;
-    String message;
-    String reason;
-    String status;
+    private List<String> errors;
+    private String message;
+    private String reason;
+    private String status;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime timestamp;
+    private LocalDateTime timestamp;
 }

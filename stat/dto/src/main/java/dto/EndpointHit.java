@@ -11,13 +11,13 @@ import javax.validation.constraints.Null;
 @AllArgsConstructor
 public class EndpointHit {
     @Null
-    Integer id;
+    private Integer id;
     @NotNull
-    String app;
+    private String app;
     @NotNull
-    String uri;
+    private String uri;
     @NotNull
-    String ip;
+    private String ip;
     @NotNull
-    String timestamp;
+    private String timestamp;
 }

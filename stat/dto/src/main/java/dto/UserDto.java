@@ -11,13 +11,13 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 public class UserDto {
-    Integer id;
+    private Integer id;
     @NotNull
     @Email
     @Size(min = 6, max = 254)
-    String email;
+    private String email;
     @NotNull
     @NotBlank
     @Size(min = 2, max = 250)
-    String name;
+    private String name;
 }

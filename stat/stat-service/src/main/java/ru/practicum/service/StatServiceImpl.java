@@ -27,7 +27,8 @@ public class StatServiceImpl implements StatService {
         } else if (LocalDateTime.parse(start, formatter)
                 .isAfter(LocalDateTime.parse(end, formatter))) {
             throw new IllegalArgumentException("\"Start\" не может быть позже \"end\"");
+        } else {
+            return statRepository.getStats(start, end, uris);
         }
-        return statRepository.getStats(start, end, uris);
     }
 }

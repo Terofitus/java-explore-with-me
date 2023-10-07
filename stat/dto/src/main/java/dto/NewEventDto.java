@@ -15,22 +15,22 @@ public class NewEventDto {
     @NotNull
     @NotBlank
     @Size(min = 20, max = 2000)
-    String annotation;
+    private String annotation;
     @NotNull
-    Integer category;
+    private Integer category;
     @NotNull
     @NotBlank
     @Size(min = 20, max = 7000)
-    String description;
+    private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
+    private LocalDateTime eventDate;
     @NotNull
-    Location location;
-    Boolean paid;
-    Integer participantLimit;
-    Boolean requestModeration = true;
+    private Location location;
+    private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration = true;
     @NotNull
     @NotBlank
     @Size(min = 3, max = 120)
-    String title;
+    private String title;
 }

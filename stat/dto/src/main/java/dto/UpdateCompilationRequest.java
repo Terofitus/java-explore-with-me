@@ -10,9 +10,9 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class UpdateCompilationRequest {
-    Set<Integer> events;
-    Boolean pinned;
+    private Set<Integer> events;
+    private Boolean pinned;
     @NotBlank
     @Size(min = 1, max = 50)
-    String title;
+    private String title;
 }

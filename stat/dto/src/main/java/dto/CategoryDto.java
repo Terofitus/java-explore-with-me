@@ -10,9 +10,9 @@ import javax.validation.constraints.Size;
 @Data
 public class CategoryDto {
     @Null
-    Integer id;
+    private Integer id;
     @NotNull
     @NotBlank
     @Size(min = 1, max = 50)
-    String name;
+    private String name;
 }

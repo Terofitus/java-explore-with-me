@@ -8,6 +8,6 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class EventRequestStatusUpdateRequest {
-    List<Integer> requestIds;
-    EventRequestStatus status;
+    private List<Integer> requestIds;
+    private EventRequestStatus status;
 }

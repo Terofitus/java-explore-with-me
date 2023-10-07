@@ -13,5 +13,5 @@ public class NewCategoryDto {
     @NotNull
     @NotBlank
     @Size(min = 1, max = 50)
-    String name;
+    private String name;
 }

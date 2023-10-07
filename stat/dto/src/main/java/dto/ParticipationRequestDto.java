@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ParticipationRequestDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime createdOn = LocalDateTime.now();
-    Integer event;
-    Integer id;
-    Integer requester;
-    String status;
+    private LocalDateTime createdOn = LocalDateTime.now();
+    private Integer event;
+    private Integer id;
+    private Integer requester;
+    private String status;
 }

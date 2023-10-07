@@ -13,19 +13,19 @@ import java.time.LocalDateTime;
 public class UpdateEventAdminRequest {
     @NotBlank
     @Size(min = 20, max = 2000)
-    String annotation;
-    Integer category;
+    private String annotation;
+    private Integer category;
     @NotBlank
     @Size(min = 20, max = 7000)
-    String description;
+    private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime eventDate;
-    Location location;
-    Boolean paid;
-    Integer participantLimit;
-    Boolean requestModeration;
-    ActionStateAdmin stateAction;
+    private LocalDateTime eventDate;
+    private Location location;
+    private Boolean paid;
+    private Integer participantLimit;
+    private Boolean requestModeration;
+    private ActionStateAdmin stateAction;
     @NotBlank
     @Size(min = 3, max = 120)
-    String title;
+    private String title;
 }
