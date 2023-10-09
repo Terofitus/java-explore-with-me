@@ -21,7 +21,7 @@ public class CompilationServiceImpl implements CompilationService {
 
 
     @Override
-    public List<Compilation> getCompilations(boolean pinned, int from, int size) {
+    public List<Compilation> getCompilations(boolean pinned, Integer from, Integer size) {
         Pageable pageable = PageableCreator.toPageable(from, size, null);
         log.info("Запрошены подборки событий с позиции {}", from);
         if (pinned) {
@@ -32,7 +32,7 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public Compilation getCompilationById(int compId) {
+    public Compilation getCompilationById(Integer compId) {
         Optional<Compilation> compilation = compilationRepository.findById(compId);
         if (compilation.isPresent()) {
             log.info("Запрошена подборка с id={}", compId);

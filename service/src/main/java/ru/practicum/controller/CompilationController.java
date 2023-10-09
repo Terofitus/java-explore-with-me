@@ -18,15 +18,15 @@ public class CompilationController {
     private final CompilationMapper compilationMapper;
 
     @GetMapping
-    public List<CompilationDto> getCompilations(@RequestParam(required = false) boolean pinned,
-                                                @RequestParam(required = false) int from,
-                                                @RequestParam(required = false, defaultValue = "10") int size) {
+    public List<CompilationDto> getCompilations(@RequestParam(required = false) Boolean pinned,
+                                                @RequestParam(required = false) Integer from,
+                                                @RequestParam(required = false, defaultValue = "10") Integer size) {
         return compilationService.getCompilations(pinned, from, size).stream().
                 map(compilationMapper::toDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{compId}")
-    public CompilationDto getCompilationById(@PathVariable int compId) {
+    public CompilationDto getCompilationById(@PathVariable Integer compId) {
         return compilationMapper.toDto(compilationService.getCompilationById(compId));
     }
 }

@@ -5,7 +5,7 @@ import ru.practicum.model.Compilation;
 import java.util.List;
 
 public interface CompilationService {
-    List<Compilation> getCompilations(boolean pinned, int from, int size);
+    List<Compilation> getCompilations(boolean pinned, Integer from, Integer size);
 
-    Compilation getCompilationById(int compId);
+    Compilation getCompilationById(Integer compId);
 }
