@@ -20,7 +20,7 @@ public class UpdateEventUserRequest {
     private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    private Location location;
+    private LocationDto locationDto;
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
