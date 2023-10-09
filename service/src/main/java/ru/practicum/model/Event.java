@@ -17,16 +17,16 @@ public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(nullable = false)
-    private LocalDateTime created_on;
+    @Column(name = "created_on",nullable = false)
+    private LocalDateTime createdOn;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "initiator_id", referencedColumnName = "id", nullable = false)
     private User initiator;
-    @Column
-    private LocalDateTime published_on;
+    @Column(name = "published_on")
+    private LocalDateTime publishedOn;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 60)
-    private EventState state_enum;
+    @Column(name = "state_enum", nullable = false, length = 60)
+    private EventState stateEnum;
     @Column(nullable = false, length = 2000)
     private String annotation;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -34,14 +34,14 @@ public class Event {
     private Category category;
     @Column(nullable = false, length = 7000)
     private String description;
-    @Column(nullable = false)
-    private LocalDateTime event_date;
+    @Column(name = "event_date", nullable = false)
+    private LocalDateTime eventDate;
     @Column(nullable = false)
     private Boolean paid;
-    @Column(nullable = false)
-    private Integer participant_limit;
-    @Column(nullable = false)
-    private Boolean request_moderation;
+    @Column(name = "participant_limit", nullable = false)
+    private Integer participantLimit;
+    @Column(name = "request_moderation", nullable = false)
+    private Boolean requestModeration;
     @Column(nullable = false, length = 120)
     private String title;
     @Column(nullable = false)
