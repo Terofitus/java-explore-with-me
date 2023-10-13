@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.compilation.CompilationService;
 import ru.practicum.util.CompilationMapper;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,13 +21,14 @@ public class CompilationController {
     @GetMapping
     public List<CompilationDto> getCompilations(@RequestParam(required = false) Boolean pinned,
                                                 @RequestParam(required = false) Integer from,
-                                                @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return compilationService.getCompilations(pinned, from, size).stream().
+                                                @RequestParam(required = false, defaultValue = "10") Integer size,
+                                                HttpServletRequest request) {
+        return compilationService.getCompilations(pinned, from, size, request).stream().
                 map(compilationMapper::toDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{compId}")
-    public CompilationDto getCompilationById(@PathVariable Integer compId) {
-        return compilationMapper.toDto(compilationService.getCompilationById(compId));
+    public CompilationDto getCompilationById(@PathVariable Integer compId, HttpServletRequest request) {
+        return compilationMapper.toDto(compilationService.getCompilationById(compId, request));
     }
 }

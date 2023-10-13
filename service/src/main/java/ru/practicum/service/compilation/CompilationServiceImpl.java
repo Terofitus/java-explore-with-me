@@ -5,11 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.client.Client;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Compilation;
 import ru.practicum.repository.CompilationRepository;
 import ru.practicum.util.PageableCreator;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,11 +20,13 @@ import java.util.Optional;
 @Slf4j
 public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
+    private final Client statClient;
 
 
     @Override
-    public List<Compilation> getCompilations(boolean pinned, Integer from, Integer size) {
+    public List<Compilation> getCompilations(boolean pinned, Integer from, Integer size, HttpServletRequest request) {
         Pageable pageable = PageableCreator.toPageable(from, size, null);
+        statClient.addHit(request);
         log.info("Запрошены подборки событий с позиции {}", from);
         if (pinned) {
             return compilationRepository.findAllByPinned(true, pageable);
@@ -32,8 +36,9 @@ public class CompilationServiceImpl implements CompilationService {
     }
 
     @Override
-    public Compilation getCompilationById(Integer compId) {
+    public Compilation getCompilationById(Integer compId, HttpServletRequest request) {
         Optional<Compilation> compilation = compilationRepository.findById(compId);
+        statClient.addHit(request);
         if (compilation.isPresent()) {
             log.info("Запрошена подборка с id={}", compId);
             return compilation.get();

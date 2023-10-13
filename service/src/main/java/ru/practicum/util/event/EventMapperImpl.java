@@ -1,10 +1,15 @@
-package ru.practicum.util;
+package ru.practicum.util.event;
 
 import dto.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
+import ru.practicum.util.CategoryMapper;
+import ru.practicum.util.LocationMapper;
+import ru.practicum.util.UserMapper;
 
+@Component
 @RequiredArgsConstructor
 public class EventMapperImpl implements EventMapper {
 
@@ -86,7 +91,7 @@ public class EventMapperImpl implements EventMapper {
     }
 
     @Override
-    public EventFullDto toDto(Event event, Integer confirmedRequests) {
+    public EventFullDto toDto(Event event) {
         if (event == null) {
             return null;
         }
@@ -95,7 +100,7 @@ public class EventMapperImpl implements EventMapper {
 
         dto.setAnnotation(event.getAnnotation());
         dto.setCategory(CategoryMapper.toCategoryDto(event.getCategory()));
-        dto.setConfirmedRequests(confirmedRequests);
+        dto.setConfirmedRequests(event.getParticipants().size());
         if (event.getCreatedOn() != null) {
             dto.setCreatedOn(event.getCreatedOn());
         }
@@ -117,7 +122,7 @@ public class EventMapperImpl implements EventMapper {
     }
 
     @Override
-    public EventShortDto toShortDto(Event event, Integer confirmedRequests) {
+    public EventShortDto toShortDto(Event event) {
         if (event == null) {
             return null;
         }
@@ -126,7 +131,7 @@ public class EventMapperImpl implements EventMapper {
 
         dto.setAnnotation(event.getAnnotation());
         dto.setCategory(CategoryMapper.toCategoryDto(event.getCategory()));
-        dto.setConfirmedRequests(confirmedRequests);
+        dto.setConfirmedRequests(event.getParticipants().size());
         if (event.getEventDate() != null) {
             dto.setEventDate(event.getEventDate());
         }

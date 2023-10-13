@@ -1,12 +1,15 @@
 package ru.practicum.model;
 
 import dto.EventState;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.WhereJoinTable;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,7 +29,7 @@ public class Event {
     private LocalDateTime publishedOn;
     @Enumerated(EnumType.STRING)
     @Column(name = "state_enum", nullable = false, length = 60)
-    private EventState stateEnum;
+    private EventState stateEnum = EventState.PENDING;
     @Column(nullable = false, length = 2000)
     private String annotation;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -40,6 +43,12 @@ public class Event {
     private Boolean paid;
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
+    @WhereJoinTable(clause = "status_enum='0'")
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "requests",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "requester_id"))
+    Set<User> participants = new HashSet<>();
     @Column(name = "request_moderation", nullable = false)
     private Boolean requestModeration;
     @Column(nullable = false, length = 120)

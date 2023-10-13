@@ -7,7 +7,7 @@ import ru.practicum.model.Request;
 @UtilityClass
 public class RequestMapper {
 
-    ParticipationRequestDto toDto(Request request) {
+    public ParticipationRequestDto toDto(Request request) {
         if (request == null) {
             return null;
         }

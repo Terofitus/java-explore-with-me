@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public class StatMapper {
-    public List<ViewStats> toListViewNotUnique(List<Hit> hits, Boolean unique) {
+    public List<ViewStats> toListView(List<Hit> hits, Boolean unique) {
         Map<String, Integer> urisStat = new HashMap<>();
         hits.forEach(hit -> urisStat.put(hit.getUri(), urisStat.getOrDefault(hit.getUri(), 0) + 1));
         List<ViewStats> viewList = new ArrayList<>();

@@ -3,11 +3,11 @@ package dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class EventRequestStatusUpdateRequest {
-    private List<Integer> requestIds;
+    private Set<Integer> requestIds;
     private EventRequestStatus status;
 }

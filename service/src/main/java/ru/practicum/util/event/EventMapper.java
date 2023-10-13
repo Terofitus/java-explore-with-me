@@ -1,4 +1,4 @@
-package ru.practicum.util;
+package ru.practicum.util.event;
 
 import dto.*;
 import ru.practicum.model.Category;
@@ -12,8 +12,8 @@ public interface EventMapper {
 
     Event toEvent(UpdateEventAdminRequest dto, Category category, Integer eventId);
 
-    EventFullDto toDto(Event event, Integer confirmedRequests);
+    EventFullDto toDto(Event event);
 
-    EventShortDto toShortDto(Event event, Integer confirmedRequests);
+    EventShortDto toShortDto(Event event);
 
 }

@@ -1,12 +1,12 @@
 package ru.practicum.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +22,7 @@ public class Compilation {
     @JoinTable(name = "Compilations_events",
         joinColumns = @JoinColumn(name = "compilation_id"),
         inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private List<Event> events;
+    private Set<Event> events;
     @Column
     @EqualsAndHashCode.Exclude
     private Boolean pinned;

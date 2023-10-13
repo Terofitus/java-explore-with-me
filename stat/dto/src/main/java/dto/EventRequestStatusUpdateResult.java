@@ -3,11 +3,11 @@ package dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class EventRequestStatusUpdateResult {
-    private List<ParticipationRequestDto> confirmedRequests;
-    private List<ParticipationRequestDto> rejectedRequests;
+    private Set<ParticipationRequestDto> confirmedRequests;
+    private Set<ParticipationRequestDto> rejectedRequests;
 }

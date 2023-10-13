@@ -3,12 +3,12 @@ package dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 public class CompilationDto {
-    private List<EventShortDto> events;
+    private Set<EventShortDto> events;
     private Integer id;
     private Boolean pinned;
     private String title;
