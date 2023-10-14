@@ -5,36 +5,27 @@ import dto.ViewStats;
 import lombok.experimental.UtilityClass;
 import ru.practicum.model.Hit;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class StatMapper {
-    public List<ViewStats> toListView(List<Hit> hits, Boolean unique) {
-        Map<String, Integer> urisStat = new HashMap<>();
-        hits.forEach(hit -> urisStat.put(hit.getUri(), urisStat.getOrDefault(hit.getUri(), 0) + 1));
-        List<ViewStats> viewList = new ArrayList<>();
-        Set<String> uris = urisStat.keySet();
-        int count = 0;
-        if (unique != null && unique) {
-            Set<String> ipStat = new HashSet<>();
+    public List<ViewStats> toListView(List<Hit> hits) {
+        Map<String, Map<String, Long>> groups = hits.stream()
+                .collect(Collectors.groupingBy(Hit::getApp,
+                        Collectors.groupingBy(Hit::getUri, Collectors.counting())));
 
-            for (Hit hit : hits) {
-                ipStat.add(hit.getIp());
+        List<ViewStats> result = new ArrayList<>();
+        for (String appName : groups.keySet()) {
+            Map<String,Long> appUriCollection = groups.get(appName);
+            for (String uriPath : appUriCollection.keySet()) {
+                result.add(new ViewStats(appName, uriPath, Math.toIntExact(appUriCollection.get(uriPath))));
             }
-            count = ipStat.size();
         }
-        for (String key: uris) {
-            viewList.add(new ViewStats("ewm-main-service", key,
-                    unique != null && unique ? count : urisStat.get(key)));
-        }
-        return viewList.stream().sorted((o1, o2) -> o2.getHits() - o1.getHits()).collect(Collectors.toList());
+        return result;
     }
 
     public Hit toHit(EndpointHit hit) {
-        return new Hit(null, hit.getApp(), hit.getUri(), hit.getIp(), LocalDateTime.parse(hit.getTimestamp(),
-                DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss")));
+        return new Hit(null, hit.getApp(), hit.getUri(), hit.getIp(), hit.getTimestamp());
     }
 }

@@ -7,7 +7,6 @@ import dto.EventState;
 import lombok.experimental.UtilityClass;
 import ru.practicum.model.QCategory;
 import ru.practicum.model.QEvent;
-import ru.practicum.model.QRequest;
 import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.model.model_attribute.EventRequestParam;
 
@@ -98,10 +97,5 @@ public class QPredicates {
         }
 
         return ExpressionUtils.allOf(predicates);
-    }
-
-    public Predicate eventRequestForOwnerPredicate(Integer userId, Integer eventId) {
-        return QRequest.request.event.id.eq(eventId)
-                .and(QRequest.request.event.initiator.id.eq(userId));
     }
 }

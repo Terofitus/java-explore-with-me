@@ -12,6 +12,7 @@ import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.PageableCreator;
 import ru.practicum.util.mapper.UserMapper;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +47,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     @Override
     public void deleteUser(Integer userId) {
         if (!userRepository.existsById(userId)) {

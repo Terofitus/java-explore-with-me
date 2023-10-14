@@ -27,11 +27,12 @@ public class Client {
     }
 
     public ResponseEntity<Object> addHit(HttpServletRequest request) {
-        return statClient.addHit(new EndpointHit(null, "ewm-service", request.getRequestURI(),
-                request.getRemoteAddr(), LocalDateTime.now().toString()));
+        return statClient.addHit(new EndpointHit(null, "ewm-main-service", request.getRequestURI(),
+                request.getRemoteAddr(), LocalDateTime.now()));
     }
 
     public List<ViewStats> gets(List<String> uris, Boolean unique) {
-        return statClient.getStats(LocalDateTime.MIN, LocalDateTime.now(), uris, unique);
+        return statClient.getStats(LocalDateTime.now().minusYears(50L),
+                LocalDateTime.now().plusYears(3L), uris, unique);
     }
 }

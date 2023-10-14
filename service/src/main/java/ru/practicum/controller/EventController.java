@@ -6,6 +6,7 @@ import dto.EventShortDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.client.Client;
 import ru.practicum.model.model_attribute.EventRequestParam;
 import ru.practicum.service.event.EventService;
 import ru.practicum.util.mapper.EventMapper;
@@ -19,15 +20,18 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class EventController {
     private final EventService eventService;
+    private final Client statClient;
     private final EventMapper mapper;
 
     @GetMapping
     public List<EventShortDto> getEvents(@ModelAttribute EventRequestParam params, HttpServletRequest request) {
-        return eventService.getEvents(params, request).stream().map(mapper::toShortDto).collect(Collectors.toList());
+        statClient.addHit(request);
+        return eventService.getEvents(params).stream().map(mapper::toShortDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEventById(@PathVariable Integer eventId,  HttpServletRequest request) {
-        return mapper.toDto(eventService.getEventById(eventId, request));
+        statClient.addHit(request);
+        return mapper.toDto(eventService.getEventById(eventId));
     }
 }

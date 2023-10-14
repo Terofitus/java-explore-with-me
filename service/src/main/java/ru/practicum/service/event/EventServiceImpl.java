@@ -1,12 +1,16 @@
 package ru.practicum.service.event;
 
+import com.querydsl.core.types.Predicate;
 import dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.Client;
 import ru.practicum.exception.ConflictArgumentException;
 import ru.practicum.exception.NotFoundException;
@@ -18,13 +22,14 @@ import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.model.model_attribute.EventRequestParam;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.LocationRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.service.category.CategoryService;
 import ru.practicum.util.PageableCreator;
 import ru.practicum.util.QPredicates;
 import ru.practicum.util.mapper.EventMapper;
+import ru.practicum.util.mapper.LocationMapper;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,18 +41,20 @@ public class EventServiceImpl implements EventService {
     private final CategoryService categoryService;
     private final CategoryRepository categoryRepository;
     private final EventRepository eventRepository;
+    private final LocationRepository locationRepository;
     private final UserRepository userRepository;
     private final EventMapper eventMapper;
     private final Client statClient;
 
+    @Transactional
     @Override
-    public List<Event> getEvents(EventRequestParam params, HttpServletRequest request) {
-        List<Event> events = (List<Event>) eventRepository.findAll(QPredicates.eventRequestParamPredicate(params),
-                PageableCreator.toPageable(params.getFrom(), params.getSize(), Sort.unsorted()));
-        log.info("Запрошены события по параматрам:/n" + params);
+    public List<Event> getEvents(EventRequestParam params) {
+        List<Event> events = eventRepository.findAll(QPredicates.eventRequestParamPredicate(params),
+                PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
+                        params.getSize() == null ? 20 : params.getSize(), Sort.unsorted())).toList();
+        log.info("Запрошены события по параматрам: " + params);
 
         if (events.isEmpty()) {
-            statClient.addHit(request);
             return Collections.emptyList();
         } else {
             addHitsToEvents(events);
@@ -62,19 +69,21 @@ public class EventServiceImpl implements EventService {
                 }
             }
 
-            statClient.addHit(request);
-
             return events;
         }
     }
 
+    @Transactional
     @Override
-    public Event getEventById(Integer id, HttpServletRequest request) {
+    public Event getEventById(Integer id) {
         Optional<Event> eventOpt = eventRepository.findById(id);
-        statClient.addHit(request);
         if (eventOpt.isPresent()) {
             log.info("Запрошено событие с id={}", id);
-            return eventOpt.get();
+            Event event = eventOpt.get();
+            List<Event> events = new ArrayList<>();
+            events.add(event);
+            addHitsToEvents(events);
+            return event;
         } else {
             log.warn("Запрошено событие по несуществующему id={}", id);
             throw new NotFoundException("Не найдено событие с id=" + id);
@@ -83,30 +92,38 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void addHitsToEvents(List<Event> events) {
+        if (events == null || events.isEmpty()) return;
         List<Integer> eventsId = events.stream().map(Event::getId).collect(Collectors.toList());
         List<String> uris = eventsId.stream().map(id -> "/event/" + id).collect(Collectors.toList());
 
         List<ViewStats> views = statClient.gets(uris, false);
         Map<String,ViewStats> urisWithView = views.stream().
                 collect(Collectors.toMap(ViewStats::getUri, view -> view));
-        events.forEach(event -> event.setViews(urisWithView.get("/event/" + event.getId()).getHits()));
+        events.forEach(event -> event.setViews(urisWithView.get("/event/" + event.getId()) == null ? 0 :
+                urisWithView.get("/event/" + event.getId()).getHits()));
     }
 
     @Override
     public List<Event> eventSearch(AdminEventSearchParam params) {
-        List<Event> events = (List<Event>) eventRepository.findAll(QPredicates.adminEventSearchPredicate(params),
-                PageableCreator.toPageable(params.getFrom(), params.getSize(), Sort.unsorted()));
+        Predicate predicate = QPredicates.adminEventSearchPredicate(params);
+        Pageable pageable = PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
+                params.getSize() == null ? 20 : params.getSize(), Sort.unsorted());
+        Page<Event> eventsPage;
+        if (predicate != null) {
+            eventsPage = eventRepository.findAll(predicate, pageable);
+        } else {
+            eventsPage = eventRepository.findAll(pageable);
+        }
         log.info("Запрошены события по параматрам:/n" + params);
 
-        if (events.isEmpty()) {
+        if (eventsPage.isEmpty()) {
             return Collections.emptyList();
-        } else {
-            addHitsToEvents(events);
         }
-
-        return events;
+        addHitsToEvents(eventsPage.toList());
+        return eventsPage.toList();
     }
 
+    @Transactional
     @Override
     public Event updateEvent(Integer eventId, UpdateEventAdminRequest requestBody) {
         Optional<Event> eventOpt = eventRepository.findById(eventId);
@@ -122,16 +139,22 @@ public class EventServiceImpl implements EventService {
         return event1;
     }
 
-    private void prepareEventForUpdateAdmin(Event event, UpdateEventAdminRequest request) {
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void prepareEventForUpdateAdmin(Event event, UpdateEventAdminRequest request) {
+        if (request == null) {
+            event.setStateEnum(EventState.PUBLISHED);
+            return;
+        }
         String annotation = request.getAnnotation();
         Integer categoryId = request.getCategory();
         String description = request.getDescription();
         LocalDateTime eventDate = request.getEventDate();
-        LocationDto locationDto = request.getLocationDto();
+        LocationDto locationDto = request.getLocation();
         Boolean paid = request.getPaid();
         Integer participantLimit = request.getParticipantLimit();
         Boolean requestModeration = request.getRequestModeration();
-        ActionStateAdmin stateAction = request.getStateAction();
+        String stateAction = request.getStateAction();
         String title = request.getTitle();
 
         if (annotation != null) {
@@ -173,7 +196,10 @@ public class EventServiceImpl implements EventService {
         }
 
         if (stateAction != null) {
-            switch (stateAction) {
+            ActionStateAdmin action = ActionStateAdmin.forValues(stateAction);
+            if (action == null) throw new IllegalArgumentException("Администратор может назначить только эти статусы" +
+                    " событиям: PUBLISH_EVENT, REJECT_EVENT");
+            switch (action) {
                 case PUBLISH_EVENT:
                     if (event.getStateEnum() == EventState.PENDING) {
                         event.setStateEnum(EventState.PUBLISHED);
@@ -207,13 +233,15 @@ public class EventServiceImpl implements EventService {
         return events;
     }
 
+    @Transactional
     @Override
     public Event addEvent(Integer userId, NewEventDto dto) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("Пользователь с id=%s не найден", userId)));
         Category category = categoryRepository.findById(dto.getCategory()).orElseThrow(
                 () -> new NotFoundException(String.format("Категория с id=%s не найдена", dto.getCategory())));
-        Event event = eventMapper.toEvent(dto, category);
+        Location location = prepareLocation(dto.getLocation());
+        Event event = eventMapper.toEvent(dto, category, user, location);
         Event eventFromDb = eventRepository.save(event);
         log.info("Добавлено событие с id={} пользователем с id={}", eventFromDb.getId(), userId);
         return event;
@@ -249,6 +277,11 @@ public class EventServiceImpl implements EventService {
     }
 
     private void prepareEventForUpdateUser(Event event, UpdateEventUserRequest request) {
+        if (request == null) {
+            event.setStateEnum(EventState.CANCELED);
+            return;
+        }
+
         if (event.getStateEnum() == EventState.PUBLISHED) {
             throw new ConflictArgumentException("Изменять можно только неопубликованные события");
         }
@@ -256,14 +289,18 @@ public class EventServiceImpl implements EventService {
         Integer categoryId = request.getCategory();
         String description = request.getDescription();
         LocalDateTime eventDate = request.getEventDate();
-        LocationDto locationDto = request.getLocationDto();
+        LocationDto locationDto = request.getLocation();
         Boolean paid = request.getPaid();
         Integer participantLimit = request.getParticipantLimit();
         Boolean requestModeration = request.getRequestModeration();
-        ActionStateUser stateAction = request.getStateAction();
+        String stateAction = request.getStateAction();
         String title = request.getTitle();
 
         if (annotation != null) {
+            if (annotation.length() < 20 || annotation.length() > 2000) {
+                throw new IllegalArgumentException("Длина аннотации события не может быть меньше 20 и больше 7000" +
+                        " символов");
+            }
             event.setAnnotation(annotation);
         }
 
@@ -273,6 +310,10 @@ public class EventServiceImpl implements EventService {
         }
 
         if (description != null) {
+            if (description.length() < 20 || description.length() > 7000) {
+                throw new IllegalArgumentException("Длина описания события не может быть меньше 20 и больше 7000" +
+                        " символов");
+            }
             event.setDescription(description);
         }
 
@@ -302,17 +343,33 @@ public class EventServiceImpl implements EventService {
         }
 
         if (stateAction != null) {
-            switch (stateAction) {
+            ActionStateUser action = ActionStateUser.forValues(stateAction);
+            if (action == null) throw new IllegalArgumentException("Пользователь может назначить только эти статусы" +
+                    " своим событиям: SEND_TO_REVIEW, CANCEL_REVIEW");
+            switch (action) {
                 case SEND_TO_REVIEW:
-                    event.setRequestModeration(true);
+                    event.setStateEnum(EventState.PENDING);
                     break;
                 case CANCEL_REVIEW:
-                    event.setRequestModeration(false);
+                    event.setStateEnum(EventState.CANCELED);
             }
         }
 
         if (title != null) {
+            if (title.length() < 3 || title.length() > 120) {
+                throw new IllegalArgumentException("Длина аннотации события не может быть меньше 20 и больше 7000" +
+                        " символов");
+            }
             event.setTitle(title);
         }
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public Location prepareLocation(LocationDto loc) {
+            Location location = locationRepository.findByLatAndLon(loc.getLat(), loc.getLon());
+            if (location == null) {
+                location = locationRepository.save(LocationMapper.toLocation(loc));
+            }
+            return location;
     }
 }

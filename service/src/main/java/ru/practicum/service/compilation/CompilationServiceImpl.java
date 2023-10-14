@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ru.practicum.client.Client;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictArgumentException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Compilation;
@@ -30,20 +30,19 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
     private final EventService eventService;
     private final CompilationRepository compilationRepository;
-    private final Client statClient;
     private final CompilationMapper mapper;
 
 
+    @Transactional
     @Override
-    public List<Compilation> getCompilations(boolean pinned, Integer from, Integer size, HttpServletRequest request) {
+    public List<Compilation> getCompilations(Boolean pinned, Integer from, Integer size, HttpServletRequest request) {
         Pageable pageable = PageableCreator.toPageable(from, size, null);
-        statClient.addHit(request);
 
         List<Compilation> compilations;
-        if (pinned) {
+        if (pinned != null && pinned) {
             compilations = compilationRepository.findAllByPinned(true, pageable);
         } else {
-            compilations = (List<Compilation>) compilationRepository.findAll(pageable);
+            compilations = compilationRepository.findCompilationsBy(pageable);
         }
         log.info("Запрошены подборки событий с позиции {}", from);
         List<Event> events = compilations.stream().flatMap(compilation -> compilation.getEvents().stream())
@@ -53,10 +52,10 @@ public class CompilationServiceImpl implements CompilationService {
         return compilations;
     }
 
+    @Transactional
     @Override
     public Compilation getCompilationById(Integer compId, HttpServletRequest request) {
         Optional<Compilation> compilation = compilationRepository.findById(compId);
-        statClient.addHit(request);
         if (compilation.isPresent()) {
             log.info("Запрошена подборка с id={}", compId);
             eventService.addHitsToEvents(new ArrayList<>(compilation.get().getEvents()));
@@ -85,11 +84,12 @@ public class CompilationServiceImpl implements CompilationService {
             compilationRepository.deleteById(id);
             log.info("Удалена подборка событий с id={}", id);
         } else {
-            log.error("Попытка удаления несуществующей подборки с id={}", id);
+            log.warn("Попытка удаления несуществующей подборки с id={}", id);
             throw new NotFoundException("Подборка событий с id=" + id + " не найдена");
         }
     }
 
+    @Transactional
     @Override
     public Compilation updateCompilation(UpdateCompilationRequest dto, Integer id) {
         if (compilationRepository.existsById(id)) {
@@ -97,7 +97,7 @@ public class CompilationServiceImpl implements CompilationService {
             log.info("Обновлена подборка с id={}", id);
             return comp;
         } else {
-            log.error("Попытка обновления несуществующей подборки с id={}", id);
+            log.warn("Попытка обновления несуществующей подборки с id={}", id);
             throw new NotFoundException("Подборка событий с id=" + id + " не найдена");
         }
     }

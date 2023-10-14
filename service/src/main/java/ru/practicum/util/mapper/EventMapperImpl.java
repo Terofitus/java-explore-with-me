@@ -5,13 +5,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
+import ru.practicum.model.Location;
+import ru.practicum.model.User;
+
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Component
 @RequiredArgsConstructor
 public class EventMapperImpl implements EventMapper {
 
     @Override
-    public Event toEvent(NewEventDto dto, Category category) {
+    public Event toEvent(NewEventDto dto, Category category, User user, Location location) {
         if (dto == null && category == null) {
             return null;
         }
@@ -25,9 +30,12 @@ public class EventMapperImpl implements EventMapper {
             event.setEventDate(dto.getEventDate());
             event.setPaid(dto.getPaid());
             event.setParticipantLimit(dto.getParticipantLimit());
-            event.setLocation(LocationMapper.toLocation(dto.getLocationDto()));
+            event.setLocation(location);
             event.setRequestModeration(dto.getRequestModeration());
             event.setTitle(dto.getTitle());
+            event.setCreatedOn(LocalDateTime.now());
+            event.setInitiator(user);
+            event.setViews(0);
         }
 
         return event;
@@ -67,15 +75,16 @@ public class EventMapperImpl implements EventMapper {
         }
 
         Event event = new Event();
-
-        event.setAnnotation(dto.getAnnotation());
+        if (Objects.requireNonNull(dto).getAnnotation() != null) {
+            event.setAnnotation(dto.getAnnotation());
+        }
         event.setCategory(category);
         if (dto.getEventDate() != null) {
             event.setEventDate(dto.getEventDate());
         }
         event.setDescription(dto.getDescription());
-        if (dto.getLocationDto() != null) {
-            event.setLocation(LocationMapper.toLocation(dto.getLocationDto()));
+        if (dto.getLocation() != null) {
+            event.setLocation(LocationMapper.toLocation(dto.getLocation()));
         }
         event.setPaid(dto.getPaid());
         event.setParticipantLimit(dto.getParticipantLimit());

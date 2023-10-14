@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.Client;
 import ru.practicum.exception.ConflictArgumentException;
 import ru.practicum.exception.NotFoundException;
@@ -17,7 +18,6 @@ import ru.practicum.util.QPredicates;
 import ru.practicum.util.mapper.CategoryMapper;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +32,7 @@ public class CategoryServiceImpl implements CategoryService {
         Pageable pageable = PageableCreator.toPageable(from, size, null);
         statClient.addHit(request);
         log.info("Запрошены категории с позиции {}", from);
-        return categoryRepository.findListAll(pageable);
+        return categoryRepository.findAllBy(pageable);
     }
 
     @Override
@@ -72,6 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
     }
 
+    @Transactional
     @Override
     public Category updateCategory(Integer id, NewCategoryDto dto) {
         Category category = CategoryMapper.toCategory(dto, id);

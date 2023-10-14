@@ -7,5 +7,5 @@ import java.util.List;
 public interface StatService {
     void addHit(Hit hit);
 
-    List<Hit> getStats(String start, String end, List<String> uris);
+    List<Hit> getStats(String start, String end, List<String> uris, Boolean unique);
 }

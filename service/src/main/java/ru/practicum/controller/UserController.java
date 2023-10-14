@@ -43,8 +43,8 @@ public class UserController {
 
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getEventsOfOwner(@PathVariable Integer userId,
-                                                @RequestParam Integer from,
-                                                @RequestParam Integer size) {
+                                                @RequestParam(required = false, defaultValue = "0") Integer from,
+                                                @RequestParam(required = false, defaultValue = "20") Integer size) {
         return eventService.getEventsOfOwner(userId, from, size)
                 .stream().map(eventMapper::toShortDto).collect(Collectors.toList());
     }
@@ -61,8 +61,8 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
-    public EventFullDto updateEvent(@PathVariable Integer userId, @PathVariable Integer eventId,
-                                    @Valid @RequestBody UpdateEventUserRequest dto) {
+    public EventFullDto updateEvent(@RequestBody(required = false) UpdateEventUserRequest dto,
+                                    @PathVariable Integer userId, @PathVariable Integer eventId) {
         return eventMapper.toDto(eventService.updateEvent(userId, eventId, dto));
     }
 

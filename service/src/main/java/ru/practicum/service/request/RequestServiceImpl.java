@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictArgumentException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Event;
@@ -14,7 +15,6 @@ import ru.practicum.model.User;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
-import ru.practicum.util.QPredicates;
 import ru.practicum.util.mapper.RequestMapper;
 
 import java.time.LocalDateTime;
@@ -28,6 +28,8 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+
+    @Transactional
     @Override
     public List<Request> getRequestsByUserId(Integer id) {
         if (userRepository.existsById(id)) {
@@ -40,6 +42,7 @@ public class RequestServiceImpl implements RequestService {
         }
     }
 
+    @Transactional
     @Override
     public Request addRequest(Integer userId, Integer eventId) {
         User user = userRepository.findById(userId).orElseThrow(
@@ -73,6 +76,7 @@ public class RequestServiceImpl implements RequestService {
         return updateRequest;
     }
 
+    @Transactional
     @Override
     public Request cancelRequest(Integer userId, Integer requestId) {
         Request request = requestRepository.findById(requestId).orElseThrow(() ->
@@ -90,15 +94,15 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getRequestsByOwnerId(Integer userId, Integer requestId) {
-        return (List<Request>) requestRepository.findAll(
-                QPredicates.eventRequestForOwnerPredicate(userId, requestId));
+    public List<Request> getRequestsByOwnerId(Integer userId, Integer eventId) {
+        return requestRepository.findAllRequestsForOwnerOfEvent(eventId, userId);
     }
 
+    @Transactional
     @Override
     public EventRequestStatusUpdateResult updateEventRequests(Integer userId, Integer eventId,
                                                               EventRequestStatusUpdateRequest dto) {
-        if (!eventRepository.exists(QPredicates.eventRequestForOwnerPredicate(userId, eventId))) {
+        if (!requestRepository.existsRequestByEventIdAndEventInitiatorId(userId, eventId)) {
             log.warn("Попытка изменения статуса заявок на участие в событии с id={} пользователем с id={}",
                     eventId, userId);
             throw new NotFoundException("Нет заявок на участие в событии");
@@ -106,7 +110,10 @@ public class RequestServiceImpl implements RequestService {
 
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие с id=" + eventId + " не существует"));
-        Set<Request> requestSet = new HashSet<>(requestRepository.findAllByRequesterIdAndEventId(userId, eventId));
+        List<Request> requestSet = requestRepository.findAllById(dto.getRequestIds());
+        if(requestSet.isEmpty()) {
+            throw new NotFoundException("Не найдено ни 1 заявки по переданным id=" + dto.getRequestIds());
+        }
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             requestSet.forEach(request -> request.setStatus(EventRequestStatus.CONFIRMED));
@@ -126,7 +133,7 @@ public class RequestServiceImpl implements RequestService {
         switch (dto.getStatus()) {
             case CONFIRMED:
                 if ((event.getParticipantLimit() - event.getParticipants().size()) > dto.getRequestIds().size()) {
-                    Map<String,Set<Request>> map = updateRequestStatus(event, requestSet);
+                    Map<String,List<Request>> map = updateRequestStatus(event, requestSet);
                     List<Request> list = new ArrayList<>();
                     list.addAll(map.get("confirmed"));
                     list.addAll(map.get("rejected"));
@@ -158,13 +165,13 @@ public class RequestServiceImpl implements RequestService {
 
     }
 
-    private Map<String,Set<Request>> updateRequestStatus(Event event, Set<Request> requests) {
-        Map<String,Set<Request>> setRequests = new HashMap<>();
+    private Map<String,List<Request>> updateRequestStatus(Event event, List<Request> requests) {
+        Map<String,List<Request>> setRequests = new HashMap<>();
         int remainder = event.getParticipantLimit() - event.getParticipants().size();
         List<Request> list = new ArrayList<>(requests);
-        Set<Request> confirmed = new HashSet<>(list.subList(0, remainder));
+        List<Request> confirmed = list.subList(0, remainder);
         confirmed.forEach(request -> request.setStatus(EventRequestStatus.CONFIRMED));
-        Set<Request> rejected = new HashSet<>(list.subList(remainder, list.size()));
+        List<Request> rejected = list.subList(remainder, list.size());
         rejected.forEach(request -> request.setStatus(EventRequestStatus.REJECTED));
         setRequests.put("confirmed", confirmed);
         setRequests.put("rejected", rejected);
