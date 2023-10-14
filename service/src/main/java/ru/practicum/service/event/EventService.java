@@ -1,6 +1,8 @@
 package ru.practicum.service.event;
 
+import dto.NewEventDto;
 import dto.UpdateEventAdminRequest;
+import dto.UpdateEventUserRequest;
 import ru.practicum.model.Event;
 import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.model.model_attribute.EventRequestParam;
@@ -18,4 +20,12 @@ public interface EventService {
     List<Event> eventSearch(AdminEventSearchParam params);
 
     Event updateEvent(Integer eventId, UpdateEventAdminRequest requestBody);
+
+    List<Event> getEventsOfOwner(Integer userId, Integer from, Integer size);
+
+    Event addEvent(Integer userId, NewEventDto dto);
+
+    Event getEventForOwner(Integer userId, Integer eventId);
+
+    Event updateEvent(Integer userId, Integer eventId, UpdateEventUserRequest dto);
 }

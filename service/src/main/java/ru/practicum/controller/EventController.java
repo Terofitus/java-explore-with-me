@@ -4,7 +4,6 @@ package ru.practicum.controller;
 import dto.EventFullDto;
 import dto.EventShortDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.model_attribute.EventRequestParam;
@@ -18,7 +17,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/events")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-@Slf4j
 public class EventController {
     private final EventService eventService;
     private final EventMapper mapper;

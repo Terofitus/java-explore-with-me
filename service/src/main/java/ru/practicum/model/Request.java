@@ -26,6 +26,6 @@ public class Request {
     @JoinColumn(name = "requester_id", referencedColumnName = "id", nullable = false)
     private User requester;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 60)
+    @Column(name = "status_enum", nullable = false, length = 60)
     private EventRequestStatus status;
 }

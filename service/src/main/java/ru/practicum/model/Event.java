@@ -43,7 +43,7 @@ public class Event {
     private Boolean paid;
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
-    @WhereJoinTable(clause = "status_enum='0'")
+    @WhereJoinTable(clause = "status_enum='CONFIRMED'")
     @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinTable(name = "requests",
             joinColumns = @JoinColumn(name = "event_id"),

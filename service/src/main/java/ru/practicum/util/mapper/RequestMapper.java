@@ -18,7 +18,7 @@ public class RequestMapper {
         dto.setRequester(request.getRequester().getId());
         dto.setCreatedOn(request.getCreated());
         dto.setEvent(request.getEvent().getId());
-        dto.setStatus(request.getStatus().name());
+        dto.setStatus(request.getStatus());
 
         return dto;
     }

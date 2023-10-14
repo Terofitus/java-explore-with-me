@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Integer userId) {
         if (!userRepository.existsById(userId)) {
-            log.warn("Попытка удаления несуществующего польщователя с id={}", userId);
+            log.warn("Попытка удаления несуществующего пользователя с id={}", userId);
             throw new NotFoundException(String.format("Пользователь с id=%s не найден", userId));
         }
         userRepository.deleteById(userId);

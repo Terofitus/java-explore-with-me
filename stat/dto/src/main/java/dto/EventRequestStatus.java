@@ -1,5 +1,5 @@
 package dto;
 
 public enum EventRequestStatus {
-    CONFIRMED, REJECTED
+    PENDING, CONFIRMED, REJECTED, CANCELED
 }

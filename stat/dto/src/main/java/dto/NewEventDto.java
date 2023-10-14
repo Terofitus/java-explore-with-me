@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -23,6 +24,7 @@ public class NewEventDto {
     @Size(min = 20, max = 7000)
     private String description;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Future
     private LocalDateTime eventDate;
     @NotNull
     private LocationDto locationDto;
