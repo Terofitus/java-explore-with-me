@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.category.CategoryService;
-import ru.practicum.util.CategoryMapper;
+import ru.practicum.util.mapper.CategoryMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;

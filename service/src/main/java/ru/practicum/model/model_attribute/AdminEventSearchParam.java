@@ -1,22 +1,22 @@
-package ru.practicum.model;
+package ru.practicum.model.model_attribute;
 
+import dto.EventState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EventRequestParam {
-    String text;
-    Set<Integer> categories;
-    Boolean paid;
+public class AdminEventSearchParam {
+    List<Integer> users;
+    List<EventState> states;
+    List<Integer> categories;
     LocalDateTime rangeStart;
     LocalDateTime rangeEnd;
-    Boolean onlyAvailable;
     Integer from;
     Integer size;
 }

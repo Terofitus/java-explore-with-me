@@ -1,4 +1,4 @@
-package ru.practicum.util.event;
+package ru.practicum.util.mapper;
 
 import dto.*;
 import ru.practicum.model.Category;
@@ -15,5 +15,4 @@ public interface EventMapper {
     EventFullDto toDto(Event event);
 
     EventShortDto toShortDto(Event event);
-
 }

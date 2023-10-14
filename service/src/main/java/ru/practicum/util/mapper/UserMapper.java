@@ -1,5 +1,6 @@
-package ru.practicum.util;
+package ru.practicum.util.mapper;
 
+import dto.NewUserRequest;
 import dto.UserDto;
 import dto.UserShortDto;
 import lombok.experimental.UtilityClass;
@@ -8,6 +9,10 @@ import ru.practicum.model.User;
 @UtilityClass
 public class UserMapper {
     public User toUser(UserDto dto) {
+        return new User(null, dto.getEmail(), dto.getName());
+    }
+
+    public User toUser(NewUserRequest dto) {
         return new User(null, dto.getEmail(), dto.getName());
     }
 

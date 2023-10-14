@@ -26,7 +26,7 @@ public class Compilation {
     @Column
     @EqualsAndHashCode.Exclude
     private Boolean pinned;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @EqualsAndHashCode.Exclude
     private String title;
 }

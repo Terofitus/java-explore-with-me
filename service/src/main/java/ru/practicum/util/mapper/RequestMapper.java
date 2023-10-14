@@ -1,4 +1,4 @@
-package ru.practicum.util;
+package ru.practicum.util.mapper;
 
 import dto.ParticipationRequestDto;
 import lombok.experimental.UtilityClass;

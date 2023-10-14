@@ -7,12 +7,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.EventRequestParam;
+import ru.practicum.model.model_attribute.EventRequestParam;
 import ru.practicum.service.event.EventService;
-import ru.practicum.util.event.EventMapper;
+import ru.practicum.util.mapper.EventMapper;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,7 @@ public class EventController {
     private final EventMapper mapper;
 
     @GetMapping
-    public List<EventShortDto> getEvents(@Valid @ModelAttribute EventRequestParam params, HttpServletRequest request) {
+    public List<EventShortDto> getEvents(@ModelAttribute EventRequestParam params, HttpServletRequest request) {
         return eventService.getEvents(params, request).stream().map(mapper::toShortDto).collect(Collectors.toList());
     }
 

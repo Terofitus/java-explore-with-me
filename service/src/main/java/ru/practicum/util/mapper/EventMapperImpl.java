@@ -1,13 +1,10 @@
-package ru.practicum.util.event;
+package ru.practicum.util.mapper;
 
 import dto.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.model.Category;
 import ru.practicum.model.Event;
-import ru.practicum.util.CategoryMapper;
-import ru.practicum.util.LocationMapper;
-import ru.practicum.util.UserMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -71,31 +68,25 @@ public class EventMapperImpl implements EventMapper {
 
         Event event = new Event();
 
-        if (dto != null) {
-            event.setAnnotation(dto.getAnnotation());
-            event.setCategory(category);
-            if (dto.getEventDate() != null) {
-                event.setEventDate(dto.getEventDate());
-            }
-            event.setDescription(dto.getDescription());
-            if (dto.getLocationDto() != null) {
-                event.setLocation(LocationMapper.toLocation(dto.getLocationDto()));
-            }
-            event.setPaid(dto.getPaid());
-            event.setParticipantLimit(dto.getParticipantLimit());
-            event.setRequestModeration(dto.getRequestModeration());
-            event.setTitle(dto.getTitle());
+        event.setAnnotation(dto.getAnnotation());
+        event.setCategory(category);
+        if (dto.getEventDate() != null) {
+            event.setEventDate(dto.getEventDate());
         }
+        event.setDescription(dto.getDescription());
+        if (dto.getLocationDto() != null) {
+            event.setLocation(LocationMapper.toLocation(dto.getLocationDto()));
+        }
+        event.setPaid(dto.getPaid());
+        event.setParticipantLimit(dto.getParticipantLimit());
+        event.setRequestModeration(dto.getRequestModeration());
+        event.setTitle(dto.getTitle());
 
         return event;
     }
 
     @Override
     public EventFullDto toDto(Event event) {
-        if (event == null) {
-            return null;
-        }
-
         EventFullDto dto = new EventFullDto();
 
         dto.setAnnotation(event.getAnnotation());
@@ -123,10 +114,6 @@ public class EventMapperImpl implements EventMapper {
 
     @Override
     public EventShortDto toShortDto(Event event) {
-        if (event == null) {
-            return null;
-        }
-
         EventShortDto dto = new EventShortDto();
 
         dto.setAnnotation(event.getAnnotation());

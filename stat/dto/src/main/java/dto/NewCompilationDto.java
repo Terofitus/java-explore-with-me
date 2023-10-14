@@ -11,7 +11,6 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class NewCompilationDto {
-    @NotNull
     private Set<Integer> events;
     private Boolean pinned;
     @NotNull
