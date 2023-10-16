@@ -28,6 +28,6 @@ public class StatController {
                                     @RequestParam(required = false) Boolean unique,
                                     @RequestParam(required = false) List<String> uris) {
 
-        return StatMapper.toListView(statService.getStats(start, end, uris, unique));
+        return StatMapper.toListView(statService.getStats(start, end, uris), unique);
     }
 }

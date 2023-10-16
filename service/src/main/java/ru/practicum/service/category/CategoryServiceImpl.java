@@ -14,7 +14,6 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Category;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.util.PageableCreator;
-import ru.practicum.util.QPredicates;
 import ru.practicum.util.mapper.CategoryMapper;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (!categoryRepository.existsById(id)) {
             log.warn("Попытка удаления несуществующей категории с id={}", id);
             throw new NotFoundException("Не существует категории с id=" + id);
-        } else if (categoryRepository.count(QPredicates.deleteCategoryPredicate(id)) > 0) {
+        } else if (categoryRepository.countCategoriesByIdRelatedEvents(id) > 0) {
             log.warn("Попытка удаления категории с относящимися к ней существующими событиями");
             throw new ConflictArgumentException("Существуют события относящиеся к категории с id=" + id);
         } else {
@@ -81,11 +80,12 @@ public class CategoryServiceImpl implements CategoryService {
             throw new NotFoundException("Не существует категории с id=" + id);
         }
         try {
-            return categoryRepository.save(category);
+            category =  categoryRepository.save(category);
         } catch (DataIntegrityViolationException e) {
             log.warn("Попытка обновления имени категории с id=" + id + " на уже существующее");
             throw new ConflictArgumentException("Изменение имени категории на '" + dto.getName() + "' " +
                     "невозможно, так как оно уже занято");
         }
+        return category;
     }
 }

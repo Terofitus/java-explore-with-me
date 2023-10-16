@@ -40,7 +40,7 @@ public class Event {
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
     @Column(nullable = false)
-    private Boolean paid;
+    private Boolean paid = false;
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
     @WhereJoinTable(clause = "status_enum='CONFIRMED'")

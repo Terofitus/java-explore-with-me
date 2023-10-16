@@ -1,6 +1,7 @@
 package ru.practicum.error_handling;
 
 import dto.ApiError;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -39,15 +40,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiError handleValidationException(final ConstraintViolationException e) {
-        return new ApiError(Arrays.stream(e.getStackTrace())
-                .map(StackTraceElement::toString).collect(Collectors.toList()),
-                e.getMessage(), e.getLocalizedMessage(),
-                HttpStatus.BAD_REQUEST.name(), LocalDateTime.now());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiError handleValidationException(final MissingServletRequestParameterException e) {
         return new ApiError(Arrays.stream(e.getStackTrace())
                 .map(StackTraceElement::toString).collect(Collectors.toList()),
@@ -76,6 +68,24 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleValidationException(final ConflictArgumentException e) {
+        return new ApiError(Arrays.stream(e.getStackTrace())
+                .map(StackTraceElement::toString).collect(Collectors.toList()),
+                e.getMessage(), e.getLocalizedMessage(),
+                HttpStatus.CONFLICT.name(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleValidationException(final ConstraintViolationException e) {
+        return new ApiError(Arrays.stream(e.getStackTrace())
+                .map(StackTraceElement::toString).collect(Collectors.toList()),
+                e.getMessage(), e.getLocalizedMessage(),
+                HttpStatus.CONFLICT.name(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleValidationException(final DataIntegrityViolationException e) {
         return new ApiError(Arrays.stream(e.getStackTrace())
                 .map(StackTraceElement::toString).collect(Collectors.toList()),
                 e.getMessage(), e.getLocalizedMessage(),

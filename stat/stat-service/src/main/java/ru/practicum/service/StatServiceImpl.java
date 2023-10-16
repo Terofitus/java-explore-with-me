@@ -23,7 +23,7 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<Hit> getStats(String start, String end, List<String> uris, Boolean unique) {
+    public List<Hit> getStats(String start, String end, List<String> uris) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("Запрос должен содержать \"start\" и \"end\" параметры");
         }
@@ -43,7 +43,7 @@ public class StatServiceImpl implements StatService {
         if (startTime.isAfter(endTime)) {
             throw new IllegalArgumentException("\"Start\" не может быть позже \"end\"");
         } else {
-            return statRepository.getStats(startTime, endTime, uris, unique);
+            return statRepository.getStats(startTime, endTime, uris);
         }
     }
 }

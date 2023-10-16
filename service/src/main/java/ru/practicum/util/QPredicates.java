@@ -5,7 +5,6 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import dto.EventState;
 import lombok.experimental.UtilityClass;
-import ru.practicum.model.QCategory;
 import ru.practicum.model.QEvent;
 import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.model.model_attribute.EventRequestParam;
@@ -39,6 +38,9 @@ public class QPredicates {
         }
 
         if (params.getRangeStart() != null && params.getRangeEnd() != null) {
+            if (params.getRangeStart().isAfter(params.getRangeEnd())) {
+                throw new IllegalArgumentException("Время начала периода не может быть позже времени конца периода");
+            }
             LocalDateTime start = params.getRangeStart();
             LocalDateTime end = params.getRangeEnd();
             BooleanExpression predicate = QEvent.event.eventDate.between(start, end);
@@ -58,12 +60,6 @@ public class QPredicates {
         predicates.add(predicate);
 
         return ExpressionUtils.allOf(predicates);
-    }
-
-    public Predicate deleteCategoryPredicate(Integer id) {
-        BooleanExpression idPredicate = QCategory.category.id.eq(id);
-        BooleanExpression noBindPredicate = QCategory.category.notIn(QEvent.event.category);
-        return ExpressionUtils.allOf(idPredicate, noBindPredicate);
     }
 
     public Predicate adminEventSearchPredicate(AdminEventSearchParam params) {

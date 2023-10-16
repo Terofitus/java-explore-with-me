@@ -24,7 +24,7 @@ public class EventFullDto {
     private LocalDateTime eventDate;
     private Integer id;
     private UserShortDto initiator;
-    private LocationDto locationDto;
+    private LocationDto location;
     private Boolean paid;
     private Integer participantLimit;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
