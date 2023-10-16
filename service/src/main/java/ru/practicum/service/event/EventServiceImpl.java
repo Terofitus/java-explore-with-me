@@ -101,8 +101,8 @@ public class EventServiceImpl implements EventService {
         List<String> uris = eventsId.stream().map(id -> "/event/" + id).collect(Collectors.toList());
 
         List<ViewStats> views = statClient.gets(uris, false);
-        Map<String, ViewStats> urisWithView = views.stream().
-                collect(Collectors.toMap(ViewStats::getUri, view -> view));
+        Map<String, ViewStats> urisWithView = views.stream()
+                        .collect(Collectors.toMap(ViewStats::getUri, view -> view));
         events.forEach(event -> event.setViews(urisWithView.get("/event/" + event.getId()) == null ? 0 :
                 urisWithView.get("/event/" + event.getId()).getHits()));
     }
