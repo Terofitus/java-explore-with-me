@@ -44,14 +44,14 @@ public class UserController {
     @GetMapping("/{userId}/events")
     public List<EventShortDto> getEventsOfOwner(@PathVariable Integer userId,
                                                 @RequestParam(required = false, defaultValue = "0") Integer from,
-                                                @RequestParam(required = false, defaultValue = "20") Integer size) {
+                                                @RequestParam(required = false, defaultValue = "10") Integer size) {
         return eventService.getEventsOfOwner(userId, from, size)
                 .stream().map(eventMapper::toShortDto).collect(Collectors.toList());
     }
 
     @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
-    public EventFullDto addEvent(@PathVariable Integer userId, @Valid @RequestBody NewEventDto dto) {
+    public EventFullDto addEvent(@Valid @RequestBody NewEventDto dto, @PathVariable Integer userId) {
         return eventMapper.toDto(eventService.addEvent(userId, dto));
     }
 
@@ -61,22 +61,23 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
-    public EventFullDto updateEvent(@RequestBody(required = false) UpdateEventUserRequest dto,
+    public EventFullDto updateEvent(@Valid @RequestBody(required = false) UpdateEventUserRequest dto,
                                     @PathVariable Integer userId, @PathVariable Integer eventId) {
         return eventMapper.toDto(eventService.updateEvent(userId, eventId, dto));
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
     public List<ParticipationRequestDto> getRequestsForOwnerOfEvent(@PathVariable Integer userId,
-                                                              @PathVariable Integer eventId) {
+                                                                    @PathVariable Integer eventId) {
         return requestService.getRequestsByOwnerId(userId, eventId).stream().map(RequestMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @PatchMapping("/{userId}/events/{eventId}/requests")
     public EventRequestStatusUpdateResult updateEventRequests(@PathVariable Integer userId,
-                                                             @PathVariable Integer eventId,
-                                                             @Valid @RequestBody EventRequestStatusUpdateRequest dto) {
+                                                              @PathVariable Integer eventId,
+                                                              @Valid @RequestBody(required = false)
+                                                              EventRequestStatusUpdateRequest dto) {
         return requestService.updateEventRequests(userId, eventId, dto);
     }
 }

@@ -4,8 +4,8 @@ import dto.NewCompilationDto;
 import dto.UpdateCompilationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,6 +14,7 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Compilation;
 import ru.practicum.model.Event;
 import ru.practicum.repository.CompilationRepository;
+import ru.practicum.repository.EventRepository;
 import ru.practicum.service.event.EventService;
 import ru.practicum.util.PageableCreator;
 import ru.practicum.util.mapper.CompilationMapper;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
     private final EventService eventService;
     private final CompilationRepository compilationRepository;
+    private final EventRepository eventRepository;
     private final CompilationMapper mapper;
 
 
@@ -69,10 +71,19 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     public Compilation addCompilation(NewCompilationDto dto) {
         try {
-            Compilation compilation = compilationRepository.save(mapper.toCompilation(dto));
+            Compilation compilationFromDto = mapper.toCompilation(dto);
+            List<Event> events = new ArrayList<>();
+            if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
+                events = eventRepository.findAllById(dto.getEvents());
+                if (events.isEmpty()) {
+                    throw new NotFoundException("По переданным id не найдено ни одного события");
+                }
+            }
+            compilationFromDto.setEvents(events);
+            Compilation compilation = compilationRepository.save(compilationFromDto);
             log.info("Добавлена новая подборка " + compilation);
             return compilation;
-        } catch (DataIntegrityViolationException e) {
+        } catch (ConstraintViolationException e) {
             log.warn("Нарушение уникальности названия подборки, title=" + dto.getTitle());
             throw new ConflictArgumentException("Подборка с таким названием уже существует");
         }
@@ -92,13 +103,38 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     @Override
     public Compilation updateCompilation(UpdateCompilationRequest dto, Integer id) {
-        if (compilationRepository.existsById(id)) {
-            Compilation comp = compilationRepository.save(mapper.toCompilation(dto));
+        Optional<Compilation> comp = compilationRepository.findById(id);
+        if (comp.isPresent()) {
+            Compilation compilation = comp.get();
+            prepareCompilationForUpdate(compilation, dto);
+            compilation = compilationRepository.save(compilation);
             log.info("Обновлена подборка с id={}", id);
-            return comp;
+            return compilation;
         } else {
             log.warn("Попытка обновления несуществующей подборки с id={}", id);
             throw new NotFoundException("Подборка событий с id=" + id + " не найдена");
+        }
+    }
+
+    private void prepareCompilationForUpdate(Compilation compilation, UpdateCompilationRequest dto) {
+        List<Integer> events = dto.getEvents();
+        Boolean pinned = dto.getPinned();
+        String title = dto.getTitle();
+
+        if (title != null && !title.isBlank()) {
+            compilation.setTitle(title);
+        }
+
+        if (pinned != null) {
+            compilation.setPinned(pinned);
+        }
+
+        if (events != null && !events.isEmpty()) {
+            List<Event> eventList = eventRepository.findAllById(events);
+            if (eventList.isEmpty()) {
+                throw new NotFoundException("Не найдено событий по переданным id=" + events);
+            }
+            compilation.setEvents(eventList);
         }
     }
 }

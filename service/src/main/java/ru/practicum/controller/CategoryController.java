@@ -21,7 +21,8 @@ public class CategoryController {
     public List<CategoryDto> getCategories(@RequestParam(required = false, defaultValue = "0") Integer from,
                                            @RequestParam(required = false, defaultValue = "10") Integer size,
                                            HttpServletRequest request) {
-        return categoryService.getCategories(from, size, request).stream().map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
+        return categoryService.getCategories(from, size, request).stream().map(CategoryMapper::toCategoryDto)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{catId}")

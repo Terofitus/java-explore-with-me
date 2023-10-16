@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import ru.practicum.model.EventSort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +24,7 @@ public class EventRequestParam {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime rangeEnd;
     Boolean onlyAvailable;
-    String sort;
+    EventSort sort;
     Integer from;
     Integer size;
 }

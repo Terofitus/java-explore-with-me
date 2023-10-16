@@ -36,7 +36,8 @@ public class StatClient {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<ViewStats> requestEntity = new HttpEntity<>(null, headers);
         ResponseEntity<List<ViewStats>> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity,
-                new ParameterizedTypeReference<List<ViewStats>>() {}, params);
+                new ParameterizedTypeReference<List<ViewStats>>() {
+                }, params);
 
         return responseEntity.getBody();
     }

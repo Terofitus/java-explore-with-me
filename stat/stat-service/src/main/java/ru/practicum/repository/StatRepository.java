@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface StatRepository extends CrudRepository<Hit, Integer>, StatRepositoryCriteria {
-    List<Hit> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique);
+    List<Hit> getStats(LocalDateTime start, LocalDateTime end, List<String> uris);
 }

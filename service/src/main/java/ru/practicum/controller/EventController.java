@@ -30,7 +30,7 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getEventById(@PathVariable Integer eventId,  HttpServletRequest request) {
+    public EventFullDto getEventById(@PathVariable Integer eventId, HttpServletRequest request) {
         statClient.addHit(request);
         return mapper.toDto(eventService.getEventById(eventId));
     }

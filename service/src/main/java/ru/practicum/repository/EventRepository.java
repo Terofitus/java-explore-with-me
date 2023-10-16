@@ -9,6 +9,6 @@ import ru.practicum.model.Event;
 import java.util.List;
 
 @Repository
-public interface EventRepository extends JpaRepository<Event,Integer>, QuerydslPredicateExecutor<Event> {
+public interface EventRepository extends JpaRepository<Event, Integer>, QuerydslPredicateExecutor<Event> {
     List<Event> findAllByInitiatorId(Integer id, Pageable pageable);
 }

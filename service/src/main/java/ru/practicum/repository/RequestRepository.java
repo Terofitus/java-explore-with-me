@@ -9,7 +9,7 @@ import ru.practicum.model.Request;
 import java.util.List;
 
 @Repository
-public interface RequestRepository extends JpaRepository<Request,Integer>, QuerydslPredicateExecutor<Request> {
+public interface RequestRepository extends JpaRepository<Request, Integer>, QuerydslPredicateExecutor<Request> {
     boolean existsRequestByRequesterIdAndEventId(Integer userId, Integer eventId);
 
     @Query("select r from Request r where r.event.id=?1 and r.event.initiator.id=?2")

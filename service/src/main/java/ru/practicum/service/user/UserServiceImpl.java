@@ -6,22 +6,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictArgumentException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.User;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.PageableCreator;
 import ru.practicum.util.mapper.UserMapper;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+
     @Override
     public List<User> getUsers(List<Integer> ids, Integer from, Integer size) {
         if (ids != null) {
@@ -29,8 +29,7 @@ public class UserServiceImpl implements UserService {
             return userRepository.findAllById(ids);
         } else {
             log.info("Запрос всех пользователей");
-            return userRepository.findAll(PageableCreator.toPageable(from, size,null))
-                    .stream().collect(Collectors.toList());
+            return userRepository.findAll(PageableCreator.toPageable(from, size, null)).getContent();
         }
     }
 

@@ -23,7 +23,7 @@ public class StatServiceImpl implements StatService {
     }
 
     @Override
-    public List<Hit> getStats(String start, String end, List<String> uris, Boolean unique) {
+    public List<Hit> getStats(String start, String end, List<String> uris) {
         if (start == null || end == null) {
             throw new IllegalArgumentException("Запрос должен содержать \"start\" и \"end\" параметры");
         }
@@ -31,8 +31,8 @@ public class StatServiceImpl implements StatService {
         DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime startTime;
         LocalDateTime endTime;
-        if(start.length() > 23) start = start.substring(0, 23);
-        if(end.length() > 23) end = end.substring(0, 23);
+        if (start.length() > 23) start = start.substring(0, 23);
+        if (end.length() > 23) end = end.substring(0, 23);
         try {
             startTime = LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), formatter1);
             endTime = LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), formatter1);
@@ -43,7 +43,7 @@ public class StatServiceImpl implements StatService {
         if (startTime.isAfter(endTime)) {
             throw new IllegalArgumentException("\"Start\" не может быть позже \"end\"");
         } else {
-            return statRepository.getStats(startTime, endTime, uris, unique);
+            return statRepository.getStats(startTime, endTime, uris);
         }
     }
 }

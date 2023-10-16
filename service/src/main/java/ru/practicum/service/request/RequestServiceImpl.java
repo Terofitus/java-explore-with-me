@@ -50,6 +50,11 @@ public class RequestServiceImpl implements RequestService {
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие с id=" + eventId + " не существует"));
 
+        if (event.getStateEnum() != EventState.PUBLISHED) {
+            log.warn("Попытка добавления заявки на участие в неопубликованном событии с id={}", eventId);
+            throw new ConflictArgumentException("Нельзя создать заявку на участие в неопубликованном событии");
+        }
+
         if (requestRepository.existsRequestByRequesterIdAndEventId(userId, eventId)) {
             log.warn("Попытка добавления уже существующей заявки на участие");
             throw new ConflictArgumentException(String.format("Заявка на участие в событии с id=%d от пользователя " +
@@ -67,7 +72,7 @@ public class RequestServiceImpl implements RequestService {
             throw new ConflictArgumentException("Достигнут лимит участников события с id=" + eventId);
         }
         Request request = new Request(null, LocalDateTime.now(), event, user, EventRequestStatus.PENDING);
-        if (!event.getRequestModeration()) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(EventRequestStatus.CONFIRMED);
         }
 
@@ -102,7 +107,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public EventRequestStatusUpdateResult updateEventRequests(Integer userId, Integer eventId,
                                                               EventRequestStatusUpdateRequest dto) {
-        if (!requestRepository.existsRequestByEventIdAndEventInitiatorId(userId, eventId)) {
+        if (!requestRepository.existsRequestByEventIdAndEventInitiatorId(eventId, userId)) {
             log.warn("Попытка изменения статуса заявок на участие в событии с id={} пользователем с id={}",
                     eventId, userId);
             throw new NotFoundException("Нет заявок на участие в событии");
@@ -110,21 +115,26 @@ public class RequestServiceImpl implements RequestService {
 
         Event event = eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Событие с id=" + eventId + " не существует"));
-        List<Request> requestSet = requestRepository.findAllById(dto.getRequestIds());
-        if(requestSet.isEmpty()) {
+
+
+        if (dto == null) {
+            throw new ConflictArgumentException("Отсутствует тело запроса");
+        }
+        List<Request> requestList = requestRepository.findAllById(dto.getRequestIds());
+        if (requestList.isEmpty()) {
             throw new NotFoundException("Не найдено ни 1 заявки по переданным id=" + dto.getRequestIds());
         }
 
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
-            requestSet.forEach(request -> request.setStatus(EventRequestStatus.CONFIRMED));
-            requestRepository.saveAll(requestSet);
-            Set<ParticipationRequestDto> requestsDto = requestSet.stream().map(RequestMapper::toDto).
-                    collect(Collectors.toSet());
+            requestList.forEach(request -> request.setStatus(EventRequestStatus.CONFIRMED));
+            requestRepository.saveAll(requestList);
+            Set<ParticipationRequestDto> requestsDto = requestList.stream().map(RequestMapper::toDto)
+                    .collect(Collectors.toSet());
             return new EventRequestStatusUpdateResult(requestsDto, Collections.emptySet());
         }
 
-        if (requestSet.stream().anyMatch(request -> request.getEvent().getStateEnum() != EventState.PENDING)) {
-            log.warn("Попытка изменения статуса у заявок на участие в событии с id={} находящихся не " +
+        if (requestList.stream().anyMatch(request -> request.getStatus() != EventRequestStatus.PENDING)) {
+            log.warn("Попытка изменения статуса у заявок на участие в событии с id={} не находящихся " +
                     "в состоянии ожидания подтверждения", eventId);
             throw new ConflictArgumentException("Нельзя изменить статус у заявки ненахоядщейся в состоянии" +
                     " ожидания подтверждения");
@@ -132,8 +142,14 @@ public class RequestServiceImpl implements RequestService {
 
         switch (dto.getStatus()) {
             case CONFIRMED:
-                if ((event.getParticipantLimit() - event.getParticipants().size()) > dto.getRequestIds().size()) {
-                    Map<String,List<Request>> map = updateRequestStatus(event, requestSet);
+                if (event.getParticipantLimit() > 0 && event.getParticipantLimit() == event.getParticipants().size()) {
+                    log.warn("Попытка подтверждения заявки на участие в событии с id={} при " +
+                            " достижении лимита на количество участников", eventId);
+                    throw new ConflictArgumentException("Заявка на участие в событии с id=" + eventId + " не может " +
+                            "быть подтверждена, так как достигло лимита на количество участников");
+                }
+                if (((event.getParticipantLimit() - event.getParticipants().size()) < requestList.size())) {
+                    Map<String, List<Request>> map = updateRequestStatus(event, requestList);
                     List<Request> list = new ArrayList<>();
                     list.addAll(map.get("confirmed"));
                     list.addAll(map.get("rejected"));
@@ -144,19 +160,19 @@ public class RequestServiceImpl implements RequestService {
                             map.get("rejected")
                                     .stream().map(RequestMapper::toDto).collect(Collectors.toSet()));
                 } else {
-                    requestSet.forEach(request -> request.setStatus(EventRequestStatus.CONFIRMED));
-                    requestRepository.saveAll(requestSet);
+                    requestList.forEach(request -> request.setStatus(EventRequestStatus.CONFIRMED));
+                    requestRepository.saveAll(requestList);
                     log.info("Обновлены статусы заявок на участие в событии с id={}", eventId);
-                    Set<ParticipationRequestDto> requestsDto = requestSet.stream().map(RequestMapper::toDto).
-                            collect(Collectors.toSet());
+                    Set<ParticipationRequestDto> requestsDto = requestList.stream().map(RequestMapper::toDto)
+                                    .collect(Collectors.toSet());
                     return new EventRequestStatusUpdateResult(requestsDto, Collections.emptySet());
                 }
             case REJECTED:
-                requestSet.forEach(request -> request.setStatus(EventRequestStatus.REJECTED));
-                requestRepository.saveAll(requestSet);
+                requestList.forEach(request -> request.setStatus(EventRequestStatus.REJECTED));
+                requestRepository.saveAll(requestList);
                 log.info("Обновлены статусы заявок на участие в событии с id={}", eventId);
-                Set<ParticipationRequestDto> requestsDto = requestSet.stream().map(RequestMapper::toDto).
-                        collect(Collectors.toSet());
+                Set<ParticipationRequestDto> requestsDto = requestList.stream().map(RequestMapper::toDto)
+                                .collect(Collectors.toSet());
                 return new EventRequestStatusUpdateResult(Collections.emptySet(), requestsDto);
             default:
                 throw new ConflictArgumentException("Неизвестный статус:" + dto.getStatus());
@@ -165,8 +181,8 @@ public class RequestServiceImpl implements RequestService {
 
     }
 
-    private Map<String,List<Request>> updateRequestStatus(Event event, List<Request> requests) {
-        Map<String,List<Request>> setRequests = new HashMap<>();
+    private Map<String, List<Request>> updateRequestStatus(Event event, List<Request> requests) {
+        Map<String, List<Request>> setRequests = new HashMap<>();
         int remainder = event.getParticipantLimit() - event.getParticipants().size();
         List<Request> list = new ArrayList<>(requests);
         List<Request> confirmed = list.subList(0, remainder);

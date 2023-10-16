@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,9 +20,9 @@ public class Compilation {
     private Integer id;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "Compilations_events",
-        joinColumns = @JoinColumn(name = "compilation_id"),
-        inverseJoinColumns = @JoinColumn(name = "event_id"))
-    private Set<Event> events;
+            joinColumns = @JoinColumn(name = "compilation_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id"))
+    private List<Event> events;
     @Column
     @EqualsAndHashCode.Exclude
     private Boolean pinned;

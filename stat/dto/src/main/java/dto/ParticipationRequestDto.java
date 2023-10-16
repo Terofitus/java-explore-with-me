@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class ParticipationRequestDto {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdOn = LocalDateTime.now();
+    private LocalDateTime created = LocalDateTime.now();
     private Integer event;
     private Integer id;
     private Integer requester;

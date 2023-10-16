@@ -48,24 +48,25 @@ public class AdminController {
     }
 
     @GetMapping("/events")
-    public List<EventShortDto> eventsSearch(@ModelAttribute AdminEventSearchParam params) {
-        return eventService.eventSearch(params).stream().map(eventMapper::toShortDto).collect(Collectors.toList());
+    public List<EventFullDto> eventsSearch(@ModelAttribute AdminEventSearchParam params) {
+        return eventService.eventSearch(params).stream().map(eventMapper::toDto).collect(Collectors.toList());
     }
 
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Integer eventId,
-                                    @RequestBody(required = false) UpdateEventAdminRequest requestBody) {
+                                    @Valid @RequestBody(required = false) UpdateEventAdminRequest requestBody) {
         return eventMapper.toDto(eventService.updateEvent(eventId, requestBody));
     }
 
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam(required = false) List<Integer> ids,
                                   @RequestParam(required = false, defaultValue = "0") Integer from,
-                                  @RequestParam(required = false, defaultValue = "20") Integer size) {
+                                  @RequestParam(required = false, defaultValue = "10") Integer size) {
         return userService.getUsers(ids, from, size).stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @PostMapping("/users")
+    @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@Valid @RequestBody NewUserRequest newUserRequest) {
         return UserMapper.toUserDto(userService.addUser(newUserRequest));
     }

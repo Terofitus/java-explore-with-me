@@ -28,10 +28,10 @@ public class EventMapperImpl implements EventMapper {
             event.setCategory(category);
             event.setDescription(dto.getDescription());
             event.setEventDate(dto.getEventDate());
-            event.setPaid(dto.getPaid());
-            event.setParticipantLimit(dto.getParticipantLimit());
+            event.setPaid(dto.getPaid() != null ? dto.getPaid() : false);
+            event.setParticipantLimit(dto.getParticipantLimit() != null ? dto.getParticipantLimit() : 0);
             event.setLocation(location);
-            event.setRequestModeration(dto.getRequestModeration());
+            event.setRequestModeration(dto.getRequestModeration() != null ? dto.getRequestModeration() : true);
             event.setTitle(dto.getTitle());
             event.setCreatedOn(LocalDateTime.now());
             event.setInitiator(user);
@@ -110,14 +110,14 @@ public class EventMapperImpl implements EventMapper {
         }
         dto.setId(event.getId());
         dto.setInitiator(UserMapper.toUserShortDto((event.getInitiator())));
-        dto.setLocationDto(LocationMapper.toLocationDto(event.getLocation()));
+        dto.setLocation(LocationMapper.toLocationDto(event.getLocation()));
         dto.setPaid(event.getPaid());
         dto.setParticipantLimit(event.getParticipantLimit());
         dto.setPublishedOn(event.getPublishedOn());
         dto.setRequestModeration(event.getRequestModeration());
         dto.setState(event.getStateEnum());
         dto.setTitle(event.getTitle());
-        dto.setViews(event.getViews());
+        dto.setViews(event.getViews() + 1);
         return dto;
     }
 
@@ -126,6 +126,7 @@ public class EventMapperImpl implements EventMapper {
         EventShortDto dto = new EventShortDto();
 
         dto.setAnnotation(event.getAnnotation());
+        dto.setDescription(event.getDescription());
         dto.setCategory(CategoryMapper.toCategoryDto(event.getCategory()));
         dto.setConfirmedRequests(event.getParticipants().size());
         if (event.getEventDate() != null) {

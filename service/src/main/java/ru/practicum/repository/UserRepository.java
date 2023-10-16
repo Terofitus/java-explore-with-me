@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.model.User;
 
 @Repository
-public interface UserRepository  extends JpaRepository<User,Integer>, QuerydslPredicateExecutor<User> {
+public interface UserRepository extends JpaRepository<User, Integer>, QuerydslPredicateExecutor<User> {
 }

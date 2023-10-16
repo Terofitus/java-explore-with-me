@@ -49,9 +49,9 @@ public class EventServiceImpl implements EventService {
     @Transactional
     @Override
     public List<Event> getEvents(EventRequestParam params) {
-        List<Event> events = eventRepository.findAll(QPredicates.eventRequestParamPredicate(params),
+        List<Event> events = new ArrayList<>(eventRepository.findAll(QPredicates.eventRequestParamPredicate(params),
                 PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
-                        params.getSize() == null ? 20 : params.getSize(), Sort.unsorted())).toList();
+                        params.getSize() == null ? 10 : params.getSize(), Sort.unsorted())).toList());
         log.info("Запрошены события по параматрам: " + params);
 
         if (events.isEmpty()) {
@@ -59,11 +59,11 @@ public class EventServiceImpl implements EventService {
         } else {
             addHitsToEvents(events);
             if (params.getSort() != null) {
-                switch(params.getSort()) {
-                    case "EVENT_DATE":
+                switch (params.getSort()) {
+                    case EVENT_DATE:
                         events.sort(Comparator.comparing(Event::getEventDate));
                         break;
-                    case "VIEWS":
+                    case VIEWS:
                         events.sort(Comparator.comparing(Event::getViews));
                         break;
                 }
@@ -78,11 +78,15 @@ public class EventServiceImpl implements EventService {
     public Event getEventById(Integer id) {
         Optional<Event> eventOpt = eventRepository.findById(id);
         if (eventOpt.isPresent()) {
-            log.info("Запрошено событие с id={}", id);
             Event event = eventOpt.get();
+            if (event.getStateEnum() != EventState.PUBLISHED) {
+                log.warn("Запрошено событие по с id={}, находящееся не в состоянии публикации", id);
+                throw new NotFoundException("Не найдено событие с id=" + id);
+            }
             List<Event> events = new ArrayList<>();
             events.add(event);
             addHitsToEvents(events);
+            log.info("Запрошено событие с id={}", id);
             return event;
         } else {
             log.warn("Запрошено событие по несуществующему id={}", id);
@@ -97,7 +101,7 @@ public class EventServiceImpl implements EventService {
         List<String> uris = eventsId.stream().map(id -> "/event/" + id).collect(Collectors.toList());
 
         List<ViewStats> views = statClient.gets(uris, false);
-        Map<String,ViewStats> urisWithView = views.stream().
+        Map<String, ViewStats> urisWithView = views.stream().
                 collect(Collectors.toMap(ViewStats::getUri, view -> view));
         events.forEach(event -> event.setViews(urisWithView.get("/event/" + event.getId()) == null ? 0 :
                 urisWithView.get("/event/" + event.getId()).getHits()));
@@ -107,7 +111,7 @@ public class EventServiceImpl implements EventService {
     public List<Event> eventSearch(AdminEventSearchParam params) {
         Predicate predicate = QPredicates.adminEventSearchPredicate(params);
         Pageable pageable = PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
-                params.getSize() == null ? 20 : params.getSize(), Sort.unsorted());
+                params.getSize() == null ? 10 : params.getSize(), Sort.unsorted());
         Page<Event> eventsPage;
         if (predicate != null) {
             eventsPage = eventRepository.findAll(predicate, pageable);
@@ -119,8 +123,8 @@ public class EventServiceImpl implements EventService {
         if (eventsPage.isEmpty()) {
             return Collections.emptyList();
         }
-        addHitsToEvents(eventsPage.toList());
-        return eventsPage.toList();
+        addHitsToEvents(new ArrayList<>(eventsPage.toList()));
+        return eventsPage.getContent();
     }
 
     @Transactional
@@ -139,8 +143,6 @@ public class EventServiceImpl implements EventService {
         return event1;
     }
 
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void prepareEventForUpdateAdmin(Event event, UpdateEventAdminRequest request) {
         if (request == null) {
             event.setStateEnum(EventState.PUBLISHED);
@@ -180,7 +182,7 @@ public class EventServiceImpl implements EventService {
         }
 
         if (locationDto != null) {
-            event.setLocation(new Location(null, locationDto.getLat(), locationDto.getLon()));
+            event.setLocation(prepareLocation(locationDto));
         }
 
         if (paid != null) {
@@ -366,10 +368,10 @@ public class EventServiceImpl implements EventService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Location prepareLocation(LocationDto loc) {
-            Location location = locationRepository.findByLatAndLon(loc.getLat(), loc.getLon());
-            if (location == null) {
-                location = locationRepository.save(LocationMapper.toLocation(loc));
-            }
-            return location;
+        Location location = locationRepository.findByLatAndLon(loc.getLat(), loc.getLon());
+        if (location == null) {
+            location = locationRepository.save(LocationMapper.toLocation(loc));
+        }
+        return location;
     }
 }

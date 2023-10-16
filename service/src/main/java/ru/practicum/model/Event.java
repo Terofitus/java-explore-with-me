@@ -17,10 +17,16 @@ import java.util.Set;
 @Entity
 @Table(name = "Events")
 public class Event {
+    @WhereJoinTable(clause = "status_enum='CONFIRMED'")
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "requests",
+            joinColumns = @JoinColumn(name = "event_id"),
+            inverseJoinColumns = @JoinColumn(name = "requester_id"))
+    Set<User> participants = new HashSet<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "created_on",nullable = false)
+    @Column(name = "created_on", nullable = false)
     private LocalDateTime createdOn;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "initiator_id", referencedColumnName = "id", nullable = false)
@@ -40,15 +46,9 @@ public class Event {
     @Column(name = "event_date", nullable = false)
     private LocalDateTime eventDate;
     @Column(nullable = false)
-    private Boolean paid;
+    private Boolean paid = false;
     @Column(name = "participant_limit", nullable = false)
     private Integer participantLimit;
-    @WhereJoinTable(clause = "status_enum='CONFIRMED'")
-    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JoinTable(name = "requests",
-            joinColumns = @JoinColumn(name = "event_id"),
-            inverseJoinColumns = @JoinColumn(name = "requester_id"))
-    Set<User> participants = new HashSet<>();
     @Column(name = "request_moderation", nullable = false)
     private Boolean requestModeration;
     @Column(nullable = false, length = 120)
