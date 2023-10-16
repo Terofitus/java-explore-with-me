@@ -8,6 +8,7 @@ services:
       - "9090:9090"
     depends_on:
       - stats-db
+      - ewm-service
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/postgres_db_stat
       - SPRING_DATASOURCE_USERNAME=stat
@@ -33,7 +34,7 @@ services:
     depends_on:
       - ewm-db
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/postgres-db-main
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/postgres_db_main
       - SPRING_DATASOURCE_USERNAME=main
       - SPRING_DATASOURCE_PASSWORD=main
       - SPRING_DRIVER_CLASS_NAME=org.postgresql.Driver
