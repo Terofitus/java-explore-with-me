@@ -14,7 +14,7 @@ public interface EventMapper {
 
     Event toEvent(UpdateEventAdminRequest dto, Category category, Integer eventId);
 
-    EventFullDto toDto(Event event);
+    EventFullDto toDto(Event event, Integer eventLikes);
 
-    EventShortDto toShortDto(Event event);
+    EventShortDto toShortDto(Event event, Integer eventLikes);
 }

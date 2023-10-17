@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.service.event.EventServiceForUser;
+import ru.practicum.model.Event;
+import ru.practicum.service.event.EventService;
+import ru.practicum.service.event.EventServiceUser;
 import ru.practicum.service.request.RequestService;
 import ru.practicum.util.mapper.EventMapper;
 import ru.practicum.util.mapper.RequestMapper;
@@ -19,7 +21,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UserController {
     private final RequestService requestService;
-    private final EventServiceForUser eventService;
+    private final EventServiceUser eventServiceUser;
+    private final EventService eventService;
     private final EventMapper eventMapper;
 
     @GetMapping("/{userId}/requests")
@@ -45,25 +48,29 @@ public class UserController {
     public List<EventShortDto> getEventsOfOwner(@PathVariable Integer userId,
                                                 @RequestParam(required = false, defaultValue = "0") Integer from,
                                                 @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return eventService.getEventsOfOwner(userId, from, size)
-                .stream().map(eventMapper::toShortDto).collect(Collectors.toList());
+        return eventServiceUser.getEventsOfOwner(userId, from, size)
+                .stream().map(event -> eventMapper.toShortDto(event, eventServiceUser.getLikesForEvent(event.getId())))
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/{userId}/events")
     @ResponseStatus(HttpStatus.CREATED)
     public EventFullDto addEvent(@Valid @RequestBody NewEventDto dto, @PathVariable Integer userId) {
-        return eventMapper.toDto(eventService.addEvent(userId, dto));
+        Event event = eventServiceUser.addEvent(userId, dto);
+        return eventMapper.toDto(event, 0);
     }
 
     @GetMapping("/{userId}/events/{eventId}")
     public EventFullDto getEventForOwner(@PathVariable Integer userId, @PathVariable Integer eventId) {
-        return eventMapper.toDto(eventService.getEventForOwner(userId, eventId));
+        return eventMapper.toDto(eventServiceUser.getEventForOwner(userId, eventId),
+                eventServiceUser.getLikesForEvent(eventId));
     }
 
     @PatchMapping("/{userId}/events/{eventId}")
     public EventFullDto updateEvent(@Valid @RequestBody(required = false) UpdateEventUserRequest dto,
                                     @PathVariable Integer userId, @PathVariable Integer eventId) {
-        return eventMapper.toDto(eventService.updateEvent(userId, eventId, dto));
+        return eventMapper.toDto(eventServiceUser.updateEvent(userId, eventId, dto),
+                eventServiceUser.getLikesForEvent(eventId));
     }
 
     @GetMapping("/{userId}/events/{eventId}/requests")
@@ -79,5 +86,18 @@ public class UserController {
                                                               @Valid @RequestBody(required = false)
                                                               EventRequestStatusUpdateRequest dto) {
         return requestService.updateEventRequests(userId, eventId, dto);
+    }
+
+    @PostMapping("/{userId}/events/{eventId}/like")
+    @ResponseStatus(HttpStatus.CREATED)
+    public EventFullDto likeEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
+        return eventMapper.toDto(eventServiceUser.addLikeEvent(userId, eventId),
+                eventServiceUser.getLikesForEvent(eventId));
+    }
+
+    @DeleteMapping("/{userId}/events/{eventId}/dislike")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void dislikeEvent(@PathVariable Integer userId, @PathVariable Integer eventId) {
+        eventServiceUser.deleteLikeEvent(userId, eventId);
     }
 }

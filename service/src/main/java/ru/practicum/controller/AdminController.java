@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.service.category.CategoryService;
 import ru.practicum.service.compilation.CompilationService;
-import ru.practicum.service.event.EventServiceForAdmin;
+import ru.practicum.service.event.EventService;
+import ru.practicum.service.event.EventServiceAdmin;
+import ru.practicum.service.event.EventServiceUser;
 import ru.practicum.service.user.UserService;
 import ru.practicum.util.mapper.CategoryMapper;
 import ru.practicum.util.mapper.CompilationMapper;
@@ -24,7 +26,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AdminController {
     private final CategoryService categoryService;
-    private final EventServiceForAdmin eventService;
+    private final EventServiceAdmin eventServiceAdmin;
+    private final EventServiceUser eventServiceUser;
+    private final EventService eventService;
     private final UserService userService;
     private final CompilationService compilationService;
     private final EventMapper eventMapper;
@@ -49,26 +53,33 @@ public class AdminController {
 
     @GetMapping("/events")
     public List<EventFullDto> eventsSearch(@ModelAttribute AdminEventSearchParam params) {
-        return eventService.eventSearch(params).stream().map(eventMapper::toDto).collect(Collectors.toList());
+        return eventServiceAdmin.eventSearch(params).stream()
+                .map(event -> eventMapper.toDto(event, eventServiceUser.getLikesForEvent(event.getId())))
+                    .sorted((o1, o2) -> o2.getRating() - o1.getRating())
+                .collect(Collectors.toList());
     }
 
     @PatchMapping("/events/{eventId}")
     public EventFullDto updateEvent(@PathVariable Integer eventId,
                                     @Valid @RequestBody(required = false) UpdateEventAdminRequest requestBody) {
-        return eventMapper.toDto(eventService.updateEvent(eventId, requestBody));
+        return eventMapper.toDto(eventServiceAdmin.updateEvent(eventId, requestBody),
+                eventServiceUser.getLikesForEvent(eventId));
     }
 
     @GetMapping("/users")
     public List<UserDto> getUsers(@RequestParam(required = false) List<Integer> ids,
                                   @RequestParam(required = false, defaultValue = "0") Integer from,
                                   @RequestParam(required = false, defaultValue = "10") Integer size) {
-        return userService.getUsers(ids, from, size).stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+        return userService.getUsers(ids, from, size).stream()
+                .map(user -> UserMapper.toUserDto(user, userService.getUserRating(user.getId())))
+                .sorted((o1, o2) -> o2.getRating() - o1.getRating())
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto addUser(@Valid @RequestBody NewUserRequest newUserRequest) {
-        return UserMapper.toUserDto(userService.addUser(newUserRequest));
+        return UserMapper.toUserDto(userService.addUser(newUserRequest), 0);
     }
 
     @DeleteMapping("/users/{userId}")

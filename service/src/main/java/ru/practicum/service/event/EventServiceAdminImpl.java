@@ -32,7 +32,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class EventServiceForAdminImpl implements EventServiceForAdmin {
+public class EventServiceAdminImpl implements EventServiceAdmin {
     private final CategoryService categoryService;
     private final EventRepository eventRepository;
     private final EventService eventService;
@@ -41,7 +41,7 @@ public class EventServiceForAdminImpl implements EventServiceForAdmin {
     public List<Event> eventSearch(AdminEventSearchParam params) {
         Predicate predicate = QPredicates.adminEventSearchPredicate(params);
         Pageable pageable = PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
-                params.getSize() == null ? 10 : params.getSize(), Sort.unsorted());
+                params.getSize() == null ? 10 : params.getSize(), Sort.by("id"));
         Page<Event> eventsPage;
         if (predicate != null) {
             eventsPage = eventRepository.findAll(predicate, pageable);

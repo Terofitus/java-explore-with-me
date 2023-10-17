@@ -18,6 +18,7 @@ import ru.practicum.model.Location;
 import ru.practicum.model.model_attribute.EventRequestParam;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.LocationRepository;
+import ru.practicum.repository.UserRepository;
 import ru.practicum.util.PageableCreator;
 import ru.practicum.util.QPredicates;
 import ru.practicum.util.mapper.LocationMapper;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
+    private final UserRepository userRepository;
     private final Client statClient;
 
     @Transactional
@@ -38,7 +40,7 @@ public class EventServiceImpl implements EventService {
     public List<Event> getEvents(EventRequestParam params) {
         List<Event> events = new ArrayList<>(eventRepository.findAll(QPredicates.eventRequestParamPredicate(params),
                 PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
-                        params.getSize() == null ? 10 : params.getSize(), Sort.unsorted())).toList());
+                        params.getSize() == null ? 10 : params.getSize(), Sort.by("id"))).toList());
         log.info("Запрошены события по параматрам: " + params);
 
         if (events.isEmpty()) {
@@ -90,7 +92,6 @@ public class EventServiceImpl implements EventService {
         events.forEach(event -> event.setViews(urisWithView.get("/event/" + event.getId()) == null ? 0 :
                 urisWithView.get("/event/" + event.getId()).getHits()));
     }
-
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)

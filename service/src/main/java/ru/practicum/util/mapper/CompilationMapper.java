@@ -7,8 +7,7 @@ import org.mapstruct.Mapper;
 import ru.practicum.model.Compilation;
 
 @Mapper(uses = {EventMapper.class})
-public interface
-CompilationMapper {
+public interface CompilationMapper {
     CompilationDto toDto(Compilation compilation);
 
     default Compilation toCompilation(NewCompilationDto dto) {

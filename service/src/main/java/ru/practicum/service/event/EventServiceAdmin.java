@@ -6,7 +6,7 @@ import ru.practicum.model.model_attribute.AdminEventSearchParam;
 
 import java.util.List;
 
-public interface EventServiceForAdmin {
+public interface EventServiceAdmin {
     List<Event> eventSearch(AdminEventSearchParam params);
 
     Event updateEvent(Integer eventId, UpdateEventAdminRequest requestBody);

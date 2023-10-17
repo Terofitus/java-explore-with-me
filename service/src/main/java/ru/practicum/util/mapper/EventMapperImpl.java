@@ -95,7 +95,7 @@ public class EventMapperImpl implements EventMapper {
     }
 
     @Override
-    public EventFullDto toDto(Event event) {
+    public EventFullDto toDto(Event event, Integer eventLikes) {
         EventFullDto dto = new EventFullDto();
 
         dto.setAnnotation(event.getAnnotation());
@@ -118,11 +118,12 @@ public class EventMapperImpl implements EventMapper {
         dto.setState(event.getStateEnum());
         dto.setTitle(event.getTitle());
         dto.setViews(event.getViews() + 1);
+        dto.setRating(eventLikes != null ? eventLikes : 0);
         return dto;
     }
 
     @Override
-    public EventShortDto toShortDto(Event event) {
+    public EventShortDto toShortDto(Event event, Integer eventLikes) {
         EventShortDto dto = new EventShortDto();
 
         dto.setAnnotation(event.getAnnotation());
@@ -137,6 +138,8 @@ public class EventMapperImpl implements EventMapper {
         dto.setPaid(event.getPaid());
         dto.setTitle(event.getTitle());
         dto.setViews(event.getViews());
+        dto.setRating(eventLikes != null ? eventLikes : 0);
+        dto.setLocation(new LocationDto(event.getLocation().getLat(), event.getLocation().getLon()));
 
         return dto;
     }

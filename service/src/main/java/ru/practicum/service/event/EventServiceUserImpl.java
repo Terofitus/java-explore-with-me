@@ -28,7 +28,7 @@ import java.util.Objects;
 @Service
 @Slf4j
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class EventServiceForUserImpl implements EventServiceForUser {
+public class EventServiceUserImpl implements EventServiceUser {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
@@ -178,5 +178,31 @@ public class EventServiceForUserImpl implements EventServiceForUser {
             }
             event.setTitle(title);
         }
+    }
+
+    @Override
+    public Event addLikeEvent(Integer userId, Integer eventId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Не найден пользователь с id=" + userId);
+        } else if (!eventRepository.existsByIdAndStateEnum(eventId, EventState.PUBLISHED)) {
+            throw new NotFoundException("Не найдено событие с id=" + eventId);
+        }
+        eventRepository.addLike(eventId, userId);
+        return eventRepository.findById(eventId).get();
+    }
+
+    @Override
+    public void deleteLikeEvent(Integer userId, Integer eventId) {
+        if (!userRepository.existsById(userId)) {
+            throw new NotFoundException("Не найден пользователь с id=" + userId);
+        } else if (!eventRepository.existsById(eventId)) {
+            throw new NotFoundException("Не найдено событие с id=" + eventId);
+        }
+        eventRepository.deleteLike(eventId, userId);
+    }
+
+    @Override
+    public Integer getLikesForEvent(Integer eventId) {
+        return eventRepository.countEventLikes(eventId);
     }
 }
