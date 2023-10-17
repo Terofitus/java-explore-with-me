@@ -11,6 +11,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,11 +26,13 @@ public class Client {
                 .build());
     }
 
-    public ResponseEntity<Object> addHit(EndpointHit hit) {
-        return statClient.addHit(hit);
+    public ResponseEntity<Object> addHit(HttpServletRequest request) {
+        return statClient.addHit(new EndpointHit(null, "ewm-main-service", request.getRequestURI(),
+                request.getRemoteAddr(), LocalDateTime.now()));
     }
 
-    public List<ViewStats> gets(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        return statClient.getStats(start, end, uris, unique);
+    public List<ViewStats> gets(List<String> uris, Boolean unique) {
+        return statClient.getStats(LocalDateTime.now().minusYears(50L),
+                LocalDateTime.now().plusYears(3L), uris, unique);
     }
 }

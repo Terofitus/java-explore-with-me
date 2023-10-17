@@ -23,10 +23,11 @@ public class StatController {
     }
 
     @GetMapping(path = "/stats")
-    public List<ViewStats> getStats(@RequestParam String start, @RequestParam String end,
+    public List<ViewStats> getStats(@RequestParam(required = false) String start,
+                                    @RequestParam(required = false) String end,
                                     @RequestParam(required = false) Boolean unique,
                                     @RequestParam(required = false) List<String> uris) {
 
-        return StatMapper.toListViewNotUnique(statService.getStats(start, end, uris), unique);
+        return StatMapper.toListView(statService.getStats(start, end, uris), unique);
     }
 }

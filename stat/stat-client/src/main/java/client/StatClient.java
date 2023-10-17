@@ -3,6 +3,7 @@ package client;
 import dto.EndpointHit;
 import dto.ViewStats;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -34,8 +35,9 @@ public class StatClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<ViewStats> requestEntity = new HttpEntity<>(null, headers);
-        ResponseEntity<List> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity,
-                List.class, params);
+        ResponseEntity<List<ViewStats>> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity,
+                new ParameterizedTypeReference<List<ViewStats>>() {
+                }, params);
 
         return responseEntity.getBody();
     }

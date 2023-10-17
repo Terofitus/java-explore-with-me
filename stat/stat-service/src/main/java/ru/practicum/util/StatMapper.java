@@ -5,14 +5,12 @@ import dto.ViewStats;
 import lombok.experimental.UtilityClass;
 import ru.practicum.model.Hit;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @UtilityClass
 public class StatMapper {
-    public List<ViewStats> toListViewNotUnique(List<Hit> hits, Boolean unique) {
+    public List<ViewStats> toListView(List<Hit> hits, Boolean unique) {
         Map<String, Integer> urisStat = new HashMap<>();
         hits.forEach(hit -> urisStat.put(hit.getUri(), urisStat.getOrDefault(hit.getUri(), 0) + 1));
         List<ViewStats> viewList = new ArrayList<>();
@@ -26,7 +24,7 @@ public class StatMapper {
             }
             count = ipStat.size();
         }
-        for (String key: uris) {
+        for (String key : uris) {
             viewList.add(new ViewStats("ewm-main-service", key,
                     unique != null && unique ? count : urisStat.get(key)));
         }
@@ -34,7 +32,6 @@ public class StatMapper {
     }
 
     public Hit toHit(EndpointHit hit) {
-        return new Hit(null, hit.getApp(), hit.getUri(), hit.getIp(), LocalDateTime.parse(hit.getTimestamp(),
-                DateTimeFormatter.ofPattern("yyyy-MM-dd' 'HH:mm:ss")));
+        return new Hit(null, hit.getApp(), hit.getUri(), hit.getIp(), hit.getTimestamp());
     }
 }

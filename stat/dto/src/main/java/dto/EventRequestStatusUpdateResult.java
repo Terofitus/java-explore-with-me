@@ -2,12 +2,14 @@ package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class EventRequestStatusUpdateResult {
-    private List<ParticipationRequestDto> confirmedRequests;
-    private List<ParticipationRequestDto> rejectedRequests;
+    private Set<ParticipationRequestDto> confirmedRequests;
+    private Set<ParticipationRequestDto> rejectedRequests;
 }

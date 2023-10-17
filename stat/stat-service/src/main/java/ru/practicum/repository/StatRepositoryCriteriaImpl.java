@@ -11,7 +11,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Repository
@@ -21,16 +20,13 @@ public class StatRepositoryCriteriaImpl implements StatRepositoryCriteria {
     private final EntityManager entityManager;
 
     @Override
-    public List<Hit> getStats(String start, String end, List<String> uris) {
+    public List<Hit> getStats(LocalDateTime start, LocalDateTime end, List<String> uris) {
 
         CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Hit> criteriaQuery = criteriaBuilder.createQuery(Hit.class);
         Root<Hit> root = criteriaQuery.from(Hit.class);
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        Predicate predicateTime = criteriaBuilder.between(root.get("timestamp"),
-                LocalDateTime.parse(start, formatter),
-                LocalDateTime.parse(end, formatter));
+        Predicate predicateTime = criteriaBuilder.between(root.get("timestamp"), start, end);
         if (uris != null && !uris.isEmpty()) {
             Predicate predicate = null;
             for (String uri : uris) {
