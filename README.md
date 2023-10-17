@@ -1,3 +1,4 @@
-# java-explore-with-me
+# Explore with me
 
-Template repository for ExploreWithMe project.
+[Pull-request feature branch](https://github.com/Terofitus/java-explore-with-me/pull/5)
+
