@@ -29,7 +29,7 @@ public class EventController {
     @GetMapping
     public List<EventShortDto> getEvents(@ModelAttribute EventRequestParam params, HttpServletRequest request) {
         statClient.addHit(request);
-        if (params.getSort() != null && params.getSort() == EventSort.RATING){
+        if (params.getSort() != null && params.getSort() == EventSort.RATING) {
             List<EventShortDto> eventsShortDto = eventService.getEvents(params).stream()
                     .map(event -> mapper.toShortDto(event, eventServiceUser.getLikesForEvent(event.getId())))
                     .collect(Collectors.toList());

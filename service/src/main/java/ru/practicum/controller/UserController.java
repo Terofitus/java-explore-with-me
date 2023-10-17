@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.Event;
-import ru.practicum.service.event.EventService;
 import ru.practicum.service.event.EventServiceUser;
 import ru.practicum.service.request.RequestService;
 import ru.practicum.util.mapper.EventMapper;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class UserController {
     private final RequestService requestService;
     private final EventServiceUser eventServiceUser;
-    private final EventService eventService;
     private final EventMapper eventMapper;
 
     @GetMapping("/{userId}/requests")

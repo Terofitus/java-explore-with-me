@@ -18,7 +18,6 @@ import ru.practicum.model.Location;
 import ru.practicum.model.model_attribute.EventRequestParam;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.LocationRepository;
-import ru.practicum.repository.UserRepository;
 import ru.practicum.util.PageableCreator;
 import ru.practicum.util.QPredicates;
 import ru.practicum.util.mapper.LocationMapper;
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
-    private final UserRepository userRepository;
     private final Client statClient;
 
     @Transactional

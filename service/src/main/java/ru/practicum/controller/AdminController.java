@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.service.category.CategoryService;
 import ru.practicum.service.compilation.CompilationService;
-import ru.practicum.service.event.EventService;
 import ru.practicum.service.event.EventServiceAdmin;
 import ru.practicum.service.event.EventServiceUser;
 import ru.practicum.service.user.UserService;
@@ -28,7 +27,6 @@ public class AdminController {
     private final CategoryService categoryService;
     private final EventServiceAdmin eventServiceAdmin;
     private final EventServiceUser eventServiceUser;
-    private final EventService eventService;
     private final UserService userService;
     private final CompilationService compilationService;
     private final EventMapper eventMapper;
@@ -55,7 +53,7 @@ public class AdminController {
     public List<EventFullDto> eventsSearch(@ModelAttribute AdminEventSearchParam params) {
         return eventServiceAdmin.eventSearch(params).stream()
                 .map(event -> eventMapper.toDto(event, eventServiceUser.getLikesForEvent(event.getId())))
-                    .sorted((o1, o2) -> o2.getRating() - o1.getRating())
+                .sorted((o1, o2) -> o2.getRating() - o1.getRating())
                 .collect(Collectors.toList());
     }
 
