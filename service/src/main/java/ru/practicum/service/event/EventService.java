@@ -1,10 +1,10 @@
 package ru.practicum.service.event;
 
-import dto.NewEventDto;
-import dto.UpdateEventAdminRequest;
-import dto.UpdateEventUserRequest;
+import dto.LocationDto;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.model.Event;
-import ru.practicum.model.model_attribute.AdminEventSearchParam;
+import ru.practicum.model.Location;
 import ru.practicum.model.model_attribute.EventRequestParam;
 
 import java.util.List;
@@ -16,15 +16,6 @@ public interface EventService {
 
     void addHitsToEvents(List<Event> events);
 
-    List<Event> eventSearch(AdminEventSearchParam params);
-
-    Event updateEvent(Integer eventId, UpdateEventAdminRequest requestBody);
-
-    List<Event> getEventsOfOwner(Integer userId, Integer from, Integer size);
-
-    Event addEvent(Integer userId, NewEventDto dto);
-
-    Event getEventForOwner(Integer userId, Integer eventId);
-
-    Event updateEvent(Integer userId, Integer eventId, UpdateEventUserRequest dto);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    Location prepareLocation(LocationDto loc);
 }

@@ -14,17 +14,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EventRequestParam {
-    String text;
-    List<Integer> categories;
-    Boolean paid;
+    private String text;
+    private List<Integer> categories;
+    private Boolean paid;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime rangeStart;
+    private LocalDateTime rangeStart;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime rangeEnd;
-    Boolean onlyAvailable;
-    EventSort sort;
-    Integer from;
-    Integer size;
+    private LocalDateTime rangeEnd;
+    private Boolean onlyAvailable;
+    private EventSort sort;
+    private Integer from;
+    private Integer size;
 }

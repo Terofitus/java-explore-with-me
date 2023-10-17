@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.model_attribute.AdminEventSearchParam;
 import ru.practicum.service.category.CategoryService;
 import ru.practicum.service.compilation.CompilationService;
-import ru.practicum.service.event.EventService;
+import ru.practicum.service.event.EventServiceForAdmin;
 import ru.practicum.service.user.UserService;
 import ru.practicum.util.mapper.CategoryMapper;
 import ru.practicum.util.mapper.CompilationMapper;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class AdminController {
     private final CategoryService categoryService;
-    private final EventService eventService;
+    private final EventServiceForAdmin eventService;
     private final UserService userService;
     private final CompilationService compilationService;
     private final EventMapper eventMapper;

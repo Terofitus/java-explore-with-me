@@ -22,7 +22,7 @@ public class Event {
     @JoinTable(name = "requests",
             joinColumns = @JoinColumn(name = "event_id"),
             inverseJoinColumns = @JoinColumn(name = "requester_id"))
-    Set<User> participants = new HashSet<>();
+    private Set<User> participants = new HashSet<>();
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

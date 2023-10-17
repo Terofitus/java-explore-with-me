@@ -14,15 +14,15 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminEventSearchParam {
-    List<Integer> users;
-    List<EventState> states;
-    List<Integer> categories;
+    private List<Integer> users;
+    private List<EventState> states;
+    private List<Integer> categories;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime rangeStart;
+    private LocalDateTime rangeStart;
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    LocalDateTime rangeEnd;
-    Integer from;
-    Integer size;
+    private LocalDateTime rangeEnd;
+    private Integer from;
+    private Integer size;
 }

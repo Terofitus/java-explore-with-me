@@ -26,7 +26,7 @@ public class CompilationController {
                                                 @RequestParam(required = false, defaultValue = "10") Integer size,
                                                 HttpServletRequest request) {
         return compilationService.getCompilations(pinned, from, size, request).stream()
-                        .map(compilationMapper::toDto).collect(Collectors.toList());
+                .map(compilationMapper::toDto).collect(Collectors.toList());
     }
 
     @GetMapping("/{compId}")
