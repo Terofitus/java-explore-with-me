@@ -11,4 +11,6 @@ public interface UserService {
     User addUser(NewUserRequest newUserRequest);
 
     void deleteUser(Integer userId);
+
+    Integer getUserRating(Integer userId);
 }

@@ -22,4 +22,5 @@ public class UserDto {
     @NotBlank
     @Size(min = 2, max = 250)
     private String name;
+    private Integer rating;
 }

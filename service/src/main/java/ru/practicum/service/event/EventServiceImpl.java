@@ -38,7 +38,7 @@ public class EventServiceImpl implements EventService {
     public List<Event> getEvents(EventRequestParam params) {
         List<Event> events = new ArrayList<>(eventRepository.findAll(QPredicates.eventRequestParamPredicate(params),
                 PageableCreator.toPageable(params.getFrom() == null ? 0 : params.getFrom(),
-                        params.getSize() == null ? 10 : params.getSize(), Sort.unsorted())).toList());
+                        params.getSize() == null ? 10 : params.getSize(), Sort.by("id"))).toList());
         log.info("Запрошены события по параматрам: " + params);
 
         if (events.isEmpty()) {
@@ -90,7 +90,6 @@ public class EventServiceImpl implements EventService {
         events.forEach(event -> event.setViews(urisWithView.get("/event/" + event.getId()) == null ? 0 :
                 urisWithView.get("/event/" + event.getId()).getHits()));
     }
-
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)

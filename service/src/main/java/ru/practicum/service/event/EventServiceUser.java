@@ -6,7 +6,7 @@ import ru.practicum.model.Event;
 
 import java.util.List;
 
-public interface EventServiceForUser {
+public interface EventServiceUser {
     List<Event> getEventsOfOwner(Integer userId, Integer from, Integer size);
 
     Event addEvent(Integer userId, NewEventDto dto);
@@ -14,5 +14,11 @@ public interface EventServiceForUser {
     Event getEventForOwner(Integer userId, Integer eventId);
 
     Event updateEvent(Integer userId, Integer eventId, UpdateEventUserRequest dto);
+
+    Event addLikeEvent(Integer userId, Integer eventId);
+
+    void deleteLikeEvent(Integer userId, Integer eventId);
+
+    Integer getLikesForEvent(Integer eventId);
 
 }

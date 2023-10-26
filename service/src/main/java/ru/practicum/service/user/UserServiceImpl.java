@@ -56,4 +56,9 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
         log.info("Удален пользователь с id=" + userId);
     }
+
+    @Override
+    public Integer getUserRating(Integer userId) {
+        return userRepository.countOwnerEventLikes(userId);
+    }
 }
