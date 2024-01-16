@@ -24,6 +24,7 @@ services:
       - POSTGRES_DB=postgres_db_stat
       - POSTGRES_USER=stat
       - POSTGRES_PASSWORD=stat
+      
 
   ewm-service:
     build: service
